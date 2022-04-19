@@ -2,8 +2,44 @@
 title: "ProyectoTD2022"
 author: "Grupo K"
 date: '2022-04-19'
-output: html_document
+output:
+# Salida html, 
+  html_document:
+    echo: yes
+    number_sections: no
+    theme: lumen
+    toc: yes
+# Salida pdf
+  pdf_document:
+    toc: yes      # Tabla de contenido (índice)
+    toc_depth: 3  # Número de niveles de la tabla de contenido (índice) # 1, ##2,###3
+    number_sections: no # Numeración de las secciones
+
 ---
+### Instalación de paquetes necesarios:
+```{r,echo=T, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/'}
+
+# Especificamos las librerías necesarias en esta lista
+
+packages = c("tidyverse","knitr","ggplot2")
+
+#use this function to check if each package is on the local machine
+#if a package is installed, it will be loaded
+#if any are not, the missing package(s) will be installed and loaded
+package.check <- lapply(packages, FUN = function(x) {
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x, dependencies = TRUE,repos='http://cran.rediris.es')
+  }
+  library(x, character.only = TRUE)
+})
+
+#verify they are loaded
+search()
+
+```
+
+### Numeración de los data frames correspondientes a las estaciones de medida:
+
 1. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca Esq. Denia
 2. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 16
 3. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 3
