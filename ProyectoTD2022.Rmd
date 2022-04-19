@@ -1,0 +1,6 @@
+---
+title: "ProyectoTD2022"
+author: "Grupo K"
+date: '2022-04-19'
+output: html_document
+---
