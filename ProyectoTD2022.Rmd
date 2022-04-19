@@ -17,7 +17,7 @@ output:
 
 ---
 ### Instalación de paquetes necesarios:
-```{r,echo=T, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/'}
+```{r,echo=T, message = F, error = F, warning = F}
 
 # Especificamos las librerías necesarias en esta lista
 
