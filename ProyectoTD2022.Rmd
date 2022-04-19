@@ -21,7 +21,7 @@ output:
 
 # Especificamos las librerías necesarias en esta lista
 
-packages = c("tidyverse","knitr","ggplot2")
+packages = c("tidyverse","knitr","ggplot2","readr")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -54,3 +54,37 @@ search()
 12. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Puerto Rico, 21
 13. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Doctor Serrano, 21
 14. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle General Prim Chaflán Donoso Cortés
+
+## Fase 4
+
+### Importar los datos
+```{r}
+#Creamos un vector con los nombres de los ficheros (sin el ".csv")
+nombres <- paste0('df',1:14)
+
+# Con un bucle for y mediante la funcion assign() le assignamos a cada nombre del 
+# vector su data frame correspondiente, leido del fichero con la función read_csv
+for(x in nombres){
+  assign(x,read_csv(str_c("data/",x,".csv"), col_types = cols(dateObserved = col_datetime(format = "%Y-%m-%d"))))
+}
+
+# Visualizamos los data frames
+vector_dfs <- list(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12,df13,df14)
+#error# for (x in 1:14){print(head(vector_dfs[[x]]))}
+```
+
+### Fusionar todos los datos en un solo dataframe
+```{r}
+# Creamos un data frame("df") equivalente al df1 con una columna añadida que 
+# dice de que estación proviene cada registro (en este caso todos provienen de la 1)
+df <- df1 %>% mutate(df1,Estacion = 1)
+
+# Con un bucle vamos haciendole joins a df añadiendo toda la informacion del 
+# resto de data frames, incluyendo en todos la nueva columna que indica en que 
+# estación se han recogido los datos
+for(x in 2:14){
+  df <- full_join(df,mutate(vector_dfs[[x]],Estacion = x))
+}
+#error# head(df)
+```
+

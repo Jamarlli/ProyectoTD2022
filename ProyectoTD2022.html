@@ -399,6 +399,12 @@ pre code {
 paquetes necesarios:</a></li>
 <li><a href="#numeración-de-los-data-frames-correspondientes-a-las-estaciones-de-medida">Numeración
 de los data frames correspondientes a las estaciones de medida:</a></li>
+<li><a href="#fase-4">Fase 4</a>
+<ul>
+<li><a href="#importar-los-datos">Importar los datos</a></li>
+<li><a href="#fusionar-todos-los-datos-en-un-solo-dataframe">Fusionar
+todos los datos en un solo dataframe</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -406,7 +412,7 @@ de los data frames correspondientes a las estaciones de medida:</a></li>
 <h3>Instalación de paquetes necesarios:</h3>
 <pre class="r"><code># Especificamos las librerías necesarias en esta lista
 
-packages = c(&quot;tidyverse&quot;,&quot;knitr&quot;,&quot;ggplot2&quot;)
+packages = c(&quot;tidyverse&quot;,&quot;knitr&quot;,&quot;ggplot2&quot;,&quot;readr&quot;)
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -461,6 +467,77 @@ la calle Doctor Serrano, 21</li>
 <li>Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en
 la calle General Prim Chaflán Donoso Cortés</li>
 </ol>
+</div>
+<div id="fase-4" class="section level2">
+<h2>Fase 4</h2>
+<div id="importar-los-datos" class="section level3">
+<h3>Importar los datos</h3>
+<pre class="r"><code>#Creamos un vector con los nombres de los ficheros (sin el &quot;.csv&quot;)
+nombres &lt;- paste0(&#39;df&#39;,1:14)
+
+# Con un bucle for y mediante la funcion assign() le assignamos a cada nombre del 
+# vector su data frame correspondiente, leido del fichero con la función read_csv
+for(x in nombres){
+  assign(x,read_csv(str_c(&quot;data/&quot;,x,&quot;.csv&quot;), col_types = cols(dateObserved = col_datetime(format = &quot;%Y-%m-%d&quot;))))
+}
+
+# Visualizamos los data frames
+vector_dfs &lt;- list(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12,df13,df14)
+#error# for (x in 1:14){print(head(vector_dfs[[x]]))}</code></pre>
+</div>
+<div id="fusionar-todos-los-datos-en-un-solo-dataframe" class="section level3">
+<h3>Fusionar todos los datos en un solo dataframe</h3>
+<pre class="r"><code># Creamos un data frame(&quot;df&quot;) equivalente al df1 con una columna añadida que 
+# dice de que estación proviene cada registro (en este caso todos provienen de la 1)
+df &lt;- df1 %&gt;% mutate(df1,Estacion = 1)
+
+# Con un bucle vamos haciendole joins a df añadiendo toda la informacion del 
+# resto de data frames, incluyendo en todos la nueva columna que indica en que 
+# estación se han recogido los datos
+for(x in 2:14){
+  df &lt;- full_join(df,mutate(vector_dfs[[x]],Estacion = x))
+}</code></pre>
+<pre><code>## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)
+## Joining, by = c(&quot;_id&quot;, &quot;recvTime&quot;, &quot;fiwareServicePath&quot;, &quot;entityType&quot;,
+## &quot;entityId&quot;, &quot;LAeq&quot;, &quot;LAeq_d&quot;, &quot;LAeq_den&quot;, &quot;LAeq_e&quot;, &quot;LAeq_n&quot;, &quot;dateObserved&quot;,
+## &quot;Estacion&quot;)</code></pre>
+<pre class="r"><code>#error# head(df)</code></pre>
+</div>
 </div>
 
 
