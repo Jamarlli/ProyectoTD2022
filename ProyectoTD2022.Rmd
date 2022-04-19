@@ -4,3 +4,17 @@ author: "Grupo K"
 date: '2022-04-19'
 output: html_document
 ---
+1. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca Esq. Denia
+2. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 16
+3. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 3
+4. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cuba, 3
+5. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 2
+6. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 61
+7. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 32
+8. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Carles Cervera, Chaflán Reina Doña María
+9. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Salvador Abril Chaflán Maestro José Serrano
+10. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Vivons Chaflán Cádiz
+11. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Carles Cervera, 34
+12. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Puerto Rico, 21
+13. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Doctor Serrano, 21
+14. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle General Prim Chaflán Donoso Cortés
