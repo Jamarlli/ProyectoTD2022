@@ -125,10 +125,20 @@ head(as.data.frame(df))
 ¿En qué franja horaria el nivel sonoro es más alto? ¿Y el más bajo?
 ¿En qué sensor el nivel sonoro es más alto? ¿Y el más bajo?
 ¿En qué día el nivel sonoro fue más alto? ¿Y el más bajo?
+¿En qué mes el nivel sonoro es más alto? ¿Y el más bajo?
+
+¿El nivel de ruido depende del día de la semana?
+¿El nivel de ruido depende del mes?
+¿El nivel de ruido depende de la estación del año?
+¿El nivel de ruido depende de la parte del mes en la que estemos (principios, mediados, finales)?
+
+¿Qué franjas horarias tienen los niveles de ruido más parecidos?
+¿Qué días de la semana tienen los niveles de ruido más parecidos?
+¿Qué meses tienen los niveles de ruido más parecidos?
 
 ¿Los niveles de ruido son más altos los fines de semana?
-¿El nivel de ruido depende del día de la semana?
-¿El nivel de ruido depende del sensor que lo mide?
+¿Se producen cambios en el nivel de ruido en épocas festivas?
+¿En qué medida el nivel de ruido depende del sensor que lo mide?
 
 
 ## Fase 5: Acondicionar los datos para que se correspondan con un tidy dataset
