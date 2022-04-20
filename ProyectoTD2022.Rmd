@@ -107,3 +107,25 @@ head(df)
 
 ```
 
+###Convertirlo a un conjunto tidy
+
+```{r}
+#Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos columnas que no varian por lo tanto podemos eliminarlas del df
+comprobando_a <-df$entityType == "NoiseLevelObserved"
+comprobando_b <-df$fiwareServicePath == "/sonometros"
+
+df<- df[,-(3:4)]
+```
+
+
+```{r}
+#Otra cosa de gran importancia es que los nombres de las columnas deben de ser representativos y que se puendan entender. Por ello le vamos a cambiar los nombres a unos más simples
+
+colnames(df)
+colnames(df)<- c("id", "Fecha_dato", "id_sensor", "1min", "Dia 7-19h", "Dia_tarde_noche", "Tarde 19-23h", "Noche 23-7h", "Dia_medidas", "Estacion")
+```
+
+```{r}
+#De esta forma también nos podemos dar cuenta de que hay unas variables puestas como columnas
+df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
+```
