@@ -16,8 +16,9 @@ output:
     number_sections: no # Numeración de las secciones
 
 ---
-###Introducción:
-Este proyecto en R está enfocado a analizar los datos recogidos por sensores que monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
+## Introducción:
+Este proyecto en R está enfocado a analizar los datos recogidos por sensores que 
+monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 ### Instalación de paquetes necesarios:
 ```{r,echo=T, message = F, error = F, warning = F}
@@ -61,23 +62,30 @@ search()
 ## Fase 4
 
 ### Importar los datos
+
 ```{r}
-#Creamos un vector con los nombres de los ficheros (sin el ".csv")
+# Creamos un vector con los nombres de los ficheros (sin el ".csv")
 nombres <- paste0('df',1:14)
+nombres
 
 # Con un bucle for y mediante la funcion assign() le assignamos a cada nombre del 
 # vector su data frame correspondiente, leido del fichero con la función read_csv
 for(x in nombres){
-  assign(x,read_csv(str_c("data/",x,".csv"), col_types = cols(dateObserved = col_datetime(format = "%Y-%m-%d"))))
+  assign(x,read_csv(str_c("data/",x,".csv"), 
+                    col_types = cols(dateObserved = 
+                                       col_datetime(format = "%Y-%m-%d"))))
 }
 
-# Visualizamos los data frames
+# Si se quisiera comprobar el estado de los data frames tras la importación se 
+# usaria la funcion head(), que muestra las primeras columnas de un dataframe 
+# (dado que ocupa mucho espacio en el html/pdf y no aporta gran informacion al 
+# corrector esta parte esta comentada)
 vector_dfs <- list(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12,df13,df14)
-#error# for (x in 1:14){print(head(vector_dfs[[x]]))}
+# for (x in 1:14){print(head(as.data.frame(vector_dfs[[x]]),n=1))}
 ```
-
 ### Fusionar todos los datos en un solo dataframe
-```{r}
+
+```{r,echo=T, message = F, error = F, warning = F}
 # Creamos un data frame("df") equivalente al df1 con una columna añadida que 
 # dice de que estación proviene cada registro (en este caso todos provienen de la 1)
 df <- df1 %>% mutate(df1,Estacion = 1)
@@ -88,44 +96,65 @@ df <- df1 %>% mutate(df1,Estacion = 1)
 for(x in 2:14){
   df <- full_join(df,mutate(vector_dfs[[x]],Estacion = x))
 }
-#error# head(df)
 ```
 
-###Previsualización de los datos
+### Previsualización de los datos
 
-Utilizamos funciones como summary, head... Para asi tener una idea de comos están distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
+Utilizamos funciones como summary, head... Para asi tener una idea de como están
+distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
 
 ```{r}
-#La función summary nos da una visualización de las columnas, sus clases y otras informaciones
+# La función summary nos da una visualización de las columnas, sus clases y 
+# otras informaciones
 summary(df)
 
-#La función glimpse de el paquete dplyr nos da una visualización rapida del dataframe que estamos tratando.
+# La función glimpse de el paquete dplyr nos da una visualización rapida del 
+# dataframe que estamos tratando.
 glimpse(df)
 
-# Por ultimo la función head nos muestra las primeras filas del df para hacernos una idea real
-head(df)
+# Por ultimo la función head nos muestra las primeras filas del df para hacernos
+# una idea real
+head(as.data.frame(df))
 
 ```
 
-###Convertirlo a un conjunto tidy
+### Exploración inicial de los datos
+
+### Preguntas que se puedan responder con los datos disponibles
+
+
+## Fase 5: Acondicionar los datos para que se correspondan con un tidy dataset
+
+### Eliminar datos innecesarios
 
 ```{r}
-#Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos columnas que no varian por lo tanto podemos eliminarlas del df
-comprobando_a <-df$entityType == "NoiseLevelObserved"
-comprobando_b <-df$fiwareServicePath == "/sonometros"
+# Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos 
+# columnas que no varian por lo tanto podemos eliminarlas del df
+all(df$entityType == "NoiseLevelObserved")
+all(df$fiwareServicePath == "/sonometros")
 
 df<- df[,-(3:4)]
 ```
-
+### Renombrar las variables
 
 ```{r}
-#Otra cosa de gran importancia es que los nombres de las columnas deben de ser representativos y que se puendan entender. Por ello le vamos a cambiar los nombres a unos más simples
+# Otra cosa de gran importancia es que los nombres de las columnas deben de ser 
+# representativos y que se puendan entender. Por ello le vamos a cambiar los 
+# nombres a unos más simples
 
 colnames(df)
-colnames(df)<- c("id", "Fecha_dato", "id_sensor", "1min", "Dia 7-19h", "Dia_tarde_noche", "Tarde 19-23h", "Noche 23-7h", "Dia_medidas", "Estacion")
+colnames(df)<- c("id","Fecha_dato","id_sensor","1min","Dia 7-19h",
+                 "Dia_tarde_noche", "Tarde 19-23h", "Noche 23-7h", 
+                 "Dia_medidas", "Estacion")
 ```
 
+### Representamos las variables en columnas y las observaciones en filas
+
 ```{r}
-#De esta forma también nos podemos dar cuenta de que hay unas variables puestas como columnas
+# De esta forma también nos podemos dar cuenta de que hay unas variables puestas 
+# como columnas
 df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
+
+# Finalmente visualizamos el data frame "df" tidy
+head(as.data.frame(df))
 ```
