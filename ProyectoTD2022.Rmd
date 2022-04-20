@@ -91,3 +91,19 @@ for(x in 2:14){
 #error# head(df)
 ```
 
+###Previsualización de los datos
+
+Utilizamos funciones como summary, head... Para asi tener una idea de comos están distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
+
+```{r}
+#La función summary nos da una visualización de las columnas, sus clases y otras informaciones
+summary(df)
+
+#La función glimpse de el paquete dplyr nos da una visualización rapida del dataframe que estamos tratando.
+glimpse(df)
+
+# Por ultimo la función head nos muestra las primeras filas del df para hacernos una idea real
+head(df)
+
+```
+
