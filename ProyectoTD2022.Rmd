@@ -122,6 +122,14 @@ head(as.data.frame(df))
 
 ### Preguntas que se puedan responder con los datos disponibles
 
+¿En qué franja horaria el nivel sonoro es más alto? ¿Y el más bajo?
+¿En qué sensor el nivel sonoro es más alto? ¿Y el más bajo?
+¿En qué día el nivel sonoro fue más alto? ¿Y el más bajo?
+
+¿Los niveles de ruido son más altos los fines de semana?
+¿El nivel de ruido depende del día de la semana?
+¿El nivel de ruido depende del sensor que lo mide?
+
 
 ## Fase 5: Acondicionar los datos para que se correspondan con un tidy dataset
 
