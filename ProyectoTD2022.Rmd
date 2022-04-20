@@ -3,7 +3,7 @@ title: "ProyectoTD2022"
 author: "Grupo K"
 date: '2022-04-19'
 output:
-# Salida html, 
+# Salida html 
   html_document:
     echo: yes
     number_sections: no
@@ -16,6 +16,9 @@ output:
     number_sections: no # Numeración de las secciones
 
 ---
+###Introducción:
+Este proyecto en R está enfocado a analizar los datos recogidos por sensores que monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
+
 ### Instalación de paquetes necesarios:
 ```{r,echo=T, message = F, error = F, warning = F}
 
