@@ -59,6 +59,26 @@ search()
 13. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Doctor Serrano, 21
 14. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle General Prim Chaflán Donoso Cortés
 
+```{r}
+# Creamos un vector con los nombres de las estaciones para poder acceder a ellos si es necesario
+nombre_estaciones <- 
+  c("Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca Esq. Denia",
+  "Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 16",
+  "Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 3",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cuba, 3",
+  "Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 2",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 61",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca, 32",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Carles Cervera, Chaflán Reina Doña María",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Salvador Abril Chaflán Maestro José Serrano",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Vivons Chaflán Cádiz",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Carles Cervera, 34",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Puerto Rico, 21",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Doctor Serrano, 21",
+  " Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle General Prim Chaflán Donoso Cortés")
+
+```
+
 ## Fase 4
 
 ### Importar los datos
@@ -98,7 +118,7 @@ for(x in 2:14){
 }
 ```
 
-### Previsualización de los datos
+### Exploración inicial de los datos
 
 Utilizamos funciones como summary, head... Para asi tener una idea de como están
 distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
@@ -117,8 +137,6 @@ glimpse(df)
 head(as.data.frame(df))
 
 ```
-
-### Exploración inicial de los datos
 
 ### Preguntas que se puedan responder con los datos disponibles
 
@@ -176,3 +194,66 @@ df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 # Finalmente visualizamos el data frame "df" tidy
 head(as.data.frame(df))
 ```
+
+## Fase 6
+
+Ajuestes que hay que hacer (no se donde meterlos)
+```{r}
+min(df$Nivel_sonoro) 
+max(df$Nivel_sonoro) # No pueden haber registros con un Nivel sonoro infinito
+which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
+
+# Dado que hay dos registros con un Nivel Sonoro con valor de Infinito, 
+# los replazamos por la media del resto de registros
+df$Nivel_sonoro[which(df$Nivel_sonoro==Inf)]<-mean(df$Nivel_sonoro[-which(df$Nivel_sonoro==Inf)])
+
+
+
+# Convertimos la estación a factor
+df <- df %>% mutate(Estacion =as.factor(Estacion))
+```
+
+
+### Graficos
+
+Nivel sonoro por estación
+```{r}
+# Seleccionamos la media del nivel sonoro por estación y la estación
+df %>% group_by(Estacion) %>% 
+  mutate(Media = mean(Nivel_sonoro)) %>% 
+  select(Estacion, Media) %>% unique() %>% 
+  
+  # Hacemos un grafico de barras con ambas variables, de manera que el color 
+  # dependa del nivel sonoro medio y añadimos limites al eje x para que se vea 
+  # mejor la diferencia del nivel sonoro entre estaciones
+  ggplot() + geom_col(aes(x= Estacion, y = Media, fill = Media)) + 
+  coord_cartesian(ylim=c(50, 70)) + 
+  
+  # Añadimos las etiquetas y leyendas
+  labs(x = "Estaciones", y = "Nivel sonoro medio",
+       title ="Nivel sonoro por estación") 
+```
+
+Niveles sonoros máximos y minimos de cada estación
+```{r}
+# Seleccionamos los máximos y mínimos de cada estación y la estación
+df %>% group_by(Estacion) %>% 
+  mutate(minimo = min(Nivel_sonoro), maximo = max(Nivel_sonoro)) %>% 
+  select(Estacion, maximo, minimo) %>%
+  unique() %>%
+  gather(key = Medida, value =Valor,-Estacion) %>% # Al crear las variables 
+                                                   # minimo y maximo hay que 
+                                                   # volver a hacer tidy el 
+                                                   # data frame
+  
+  # Hacemos un grafico de barras con las variables Estacion, Valor y Medida y 
+  # agrupando visualmente por estaciones con el argumento position
+  ggplot() + 
+  geom_col(aes(x = Estacion,y=Valor, fill=Medida), position = position_dodge(width = 0.65)) + 
+  
+  #Añadimos las etiquetas y leyendas
+  labs(x = "Estaciones", y = "Nivel sonoro",
+       title ="Niveles sonoros mínimos y máximos por estación") 
+```
+
+
