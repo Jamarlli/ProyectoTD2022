@@ -194,10 +194,8 @@ df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 # Finalmente visualizamos el data frame "df" tidy
 head(as.data.frame(df))
 ```
+### Ajustes extra
 
-## Fase 6
-
-Ajuestes que hay que hacer (no se donde meterlos)
 ```{r}
 min(df$Nivel_sonoro) 
 max(df$Nivel_sonoro) # No pueden haber registros con un Nivel sonoro infinito
@@ -207,12 +205,11 @@ which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
 # los replazamos por la media del resto de registros
 df$Nivel_sonoro[which(df$Nivel_sonoro==Inf)]<-mean(df$Nivel_sonoro[-which(df$Nivel_sonoro==Inf)])
 
-
-
 # Convertimos la estación a factor
 df <- df %>% mutate(Estacion =as.factor(Estacion))
 ```
 
+## Fase 6
 
 ### Graficos
 
