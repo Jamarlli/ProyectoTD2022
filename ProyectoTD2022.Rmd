@@ -194,7 +194,7 @@ df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 # Finalmente visualizamos el data frame "df" tidy
 head(as.data.frame(df))
 ```
-### Ajustes extra
+### Ajustes extra de las variables
 
 ```{r}
 min(df$Nivel_sonoro) 
