@@ -88,7 +88,7 @@ nombre_estaciones <-
 nombres <- paste0('df',1:14)
 nombres
 
-# Con un bucle for y mediante la funcion assign() le assignamos a cada nombre del 
+# Con un bucle for y mediante la funcion assign() le asignamos a cada nombre del 
 # vector su data frame correspondiente, leido del fichero con la función read_csv
 for(x in nombres){
   assign(x,read_csv(str_c("data/",x,".csv"), 
@@ -165,7 +165,7 @@ head(as.data.frame(df))
 
 ```{r}
 # Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos 
-# columnas que no varian por lo tanto podemos eliminarlas del df
+# columnas que no varian, por lo tanto, podemos eliminarlas del df
 all(df$entityType == "NoiseLevelObserved")
 all(df$fiwareServicePath == "/sonometros")
 
@@ -174,8 +174,8 @@ df<- df[,-(3:4)]
 ### Renombrar las variables
 
 ```{r}
-# Otra cosa de gran importancia es que los nombres de las columnas deben de ser 
-# representativos y que se puendan entender. Por ello le vamos a cambiar los 
+# Otra cosa de gran importancia es que los nombres de las columnas deben ser 
+# representativos y se deben poder entender. Por ello le vamos a cambiar los 
 # nombres a unos más simples
 
 colnames(df)
@@ -198,22 +198,22 @@ head(as.data.frame(df))
 
 ```{r}
 min(df$Nivel_sonoro) 
-max(df$Nivel_sonoro) # No pueden haber registros con un Nivel sonoro infinito
+max(df$Nivel_sonoro) # No puede haber registros con un Nivel sonoro infinito
 which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
 
 # Dado que hay dos registros con un Nivel Sonoro con valor de Infinito, 
-# los replazamos por la media del resto de registros
+# los reemplazamos por la media del resto de registros
 df$Nivel_sonoro[which(df$Nivel_sonoro==Inf)]<-mean(df$Nivel_sonoro[-which(df$Nivel_sonoro==Inf)])
 
 # Convertimos la estación a factor
-df <- df %>% mutate(Estacion =as.factor(Estacion))
+df <- df %>% mutate(Estacion = as.factor(Estacion))
 ```
 
 ## Fase 6
 
 ### Graficos
 
-Nivel sonoro por estación
+#### Nivel sonoro por estación
 ```{r}
 # Seleccionamos la media del nivel sonoro por estación y la estación
 g_nsonoro <- df %>% group_by(Estacion) %>% 
@@ -234,7 +234,7 @@ g_nsonoro <- df %>% group_by(Estacion) %>%
   ggplotly(g_nsonoro,tooltip = c("x", "y"))
 ```
 
-Niveles sonoros máximos y minimos de cada estación
+#### Niveles sonoros máximos y minimos de cada estación
 ```{r}
 # Seleccionamos los máximos y mínimos de cada estación y la estación
 g_maxmin <- df %>% group_by(Estacion) %>% 
@@ -259,7 +259,7 @@ g_maxmin <- df %>% group_by(Estacion) %>%
   ggplotly(g_maxmin)
 ```
 
-
+#### Nivel sonoro por franja horaria
 ```{r}
 #Se selecciona la media del nivel sonoro para cada franja horaria y la propia franja horaria, agrupando por esta última
 g_nsonorofh <- df %>% group_by(Franja_horaria) %>% 
