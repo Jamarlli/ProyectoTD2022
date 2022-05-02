@@ -25,7 +25,7 @@ monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 # Especificamos las librerías necesarias en esta lista
 
-packages = c("tidyverse","knitr","ggplot2","readr","plotly")
+packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -276,5 +276,22 @@ g_nsonorofh <- df %>% group_by(Franja_horaria) %>%
 
   #Se utiliza ggplotly para que el gráfico sea interactivo
   ggplotly(g_nsonorofh,tooltip = c("x", "y"))
+```
+
+```{r}
+#Se crea una columna con los días de la semana y se ordenan empezando por el lunes
+g_diassemana <- df %>% 
+  mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>%
+  #Se seleccionan solo las columnas necesarias, el nivel sonoro y los días de la semana
+  select(Nivel_sonoro, Dia_semana) %>% 
+  #Se utiliza el boxplot para visualizar el mínimo, el máximo, la mediana, los cuantiles y los outliers para cada día de la semana
+  ggplot() + geom_boxplot(aes(x = Dia_semana, y = Nivel_sonoro)) + 
+  #Se gira el gráfico para una mejor visualización de los datos
+  coord_flip() +
+  #Se añaden las etiquetas y el título
+  labs(x = "Días de la semana", y = "Nivel sonoro",
+       title ="Nivel sonoro por día de la semana")
+#Se utiliza ggplotly para que el gráfico sea interactivo
+ggplotly(g_diassemana,tooltip = c("x", "y"))
 ```
 
