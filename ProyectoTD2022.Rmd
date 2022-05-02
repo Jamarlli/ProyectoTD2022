@@ -260,3 +260,21 @@ g_maxmin <- df %>% group_by(Estacion) %>%
 ```
 
 
+```{r}
+#Se selecciona la media del nivel sonoro para cada franja horaria y la propia franja horaria, agrupando por esta última
+g_nsonorofh <- df %>% group_by(Franja_horaria) %>% 
+  mutate(Media = mean(Nivel_sonoro)) %>% 
+  select(Franja_horaria, Media) %>% unique() %>% 
+  #Se hace un gráfico de barras con ambas variables, de manera que el color dependa del nivel sonoro medio 
+  ggplot() + geom_col(aes(x = Franja_horaria, y = Media, fill = Media)) + 
+  scale_fill_gradient(name = "nivel", low = "mediumpurple4", high = "mediumorchid") +
+  #Se añaden límites en el eje x para que se aprecie mejor la diferencia de nivel sonoro en cada franja horaria
+  coord_cartesian(ylim=c(50, 65)) +
+  #Se añaden las etiquetas y el título
+  labs(x = "Franjas horarias", y = "Nivel sonoro medio",
+       title ="Nivel sonoro por franja horaria") 
+
+  #Se utiliza ggplotly para que el gráfico sea interactivo
+  ggplotly(g_nsonorofh,tooltip = c("x", "y"))
+```
+
