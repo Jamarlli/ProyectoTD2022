@@ -25,7 +25,7 @@ monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 # Especificamos las librerías necesarias en esta lista
 
-packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate")
+packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate","gganimate")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -207,6 +207,12 @@ df$Nivel_sonoro[which(df$Nivel_sonoro==Inf)]<-mean(df$Nivel_sonoro[-which(df$Niv
 
 # Convertimos la estación a factor
 df <- df %>% mutate(Estacion = as.factor(Estacion))
+
+#Convertimos la Fecha_dato a fecha
+df <- df %>% mutate(Fecha_dato = as.Date(Fecha_dato))
+
+# Convertimos la Franja horaria a factor
+df <- df %>% mutate(Franja_horaria = as.factor(Franja_horaria))
 ```
 
 ## Fase 6
@@ -229,7 +235,6 @@ g_nsonoro <- df %>% group_by(Estacion) %>%
   # Añadimos las etiquetas y leyendas
   labs(x = "Estaciones", y = "Nivel sonoro medio",
        title ="Nivel sonoro por estación") 
-
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_nsonoro,tooltip = c("x", "y"))
 ```
@@ -278,6 +283,7 @@ g_nsonorofh <- df %>% group_by(Franja_horaria) %>%
   ggplotly(g_nsonorofh,tooltip = c("x", "y"))
 ```
 
+#### Nivel sonoro por dia de la semana
 ```{r}
 #Se crea una columna con los días de la semana y se ordenan empezando por el lunes
 g_diassemana <- df %>% 
@@ -293,5 +299,19 @@ g_diassemana <- df %>%
        title ="Nivel sonoro por día de la semana")
 #Se utiliza ggplotly para que el gráfico sea interactivo
 ggplotly(g_diassemana,tooltip = c("x", "y"))
+```
+
+```{r}
+df %>% filter(str_detect(Franja_horaria, "h")) %>% mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>%
+  group_by(Franja_horaria,Dia_semana) %>% mutate(Nivel_por_dia = mean(Nivel_sonoro)) %>% 
+  #Se seleccionan solo las columnas necesarias
+  select(Franja_horaria,Nivel_por_dia, Dia_semana) %>% distinct() %>% 
+  ggplot(aes(x=Dia_semana,y=Nivel_por_dia,col=Franja_horaria,group=Franja_horaria)) + 
+  geom_point() + 
+  geom_line() +
+  #Se añaden las etiquetas y el título
+  labs(x = "Días de la semana", y = "Nivel sonoro",
+       title ="Nivel sonoro por franja horaria y día de la semana")
+
 ```
 
