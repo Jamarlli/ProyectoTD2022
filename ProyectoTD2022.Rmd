@@ -238,7 +238,18 @@ g_nsonoro <- df %>% group_by(Estacion) %>%
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_nsonoro,tooltip = c("x", "y"))
 ```
+```{r}
+#Otra forma de ponerlo podría ser mediante boxplots
 
+#Primero seleccionamos que dos variables queremos comparar
+ggplot(df, aes(Estacion, Nivel_sonoro, colour = Estacion)) +
+  geom_boxplot() +
+  scale_y_log10() + 
+  #Añadimos las etiquetas y leyendas
+  labs(x = "Estaciones", y = "Nivel sonoro medio",
+       title ="Nivel sonoro por estación")
+  
+```
 #### Niveles sonoros máximos y minimos de cada estación
 ```{r}
 # Seleccionamos los máximos y mínimos de cada estación y la estación
@@ -263,6 +274,8 @@ g_maxmin <- df %>% group_by(Estacion) %>%
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_maxmin)
 ```
+
+
 
 #### Nivel sonoro por franja horaria
 ```{r}
