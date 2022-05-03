@@ -379,4 +379,23 @@ df %>%
 
 ```
 
+### Nivel sonoro medio por dia
+```{r}
+# Seleccionamos la media del nivel sonoro por día de la semana y la estación
+g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% 
+  mutate(Media = mean(Nivel_sonoro)) %>% 
+  select(Dia_medidas, Media) %>% unique() %>% 
+  
+  # Hacemos un grafico de barras con ambas variables, de manera que el color 
+  # dependa del nivel sonoro medio y añadimos limites al eje x para que se vea 
+  # mejor la diferencia del nivel sonoro entre dias
+  ggplot() + geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
+  coord_cartesian(ylim=c(50, 70)) + 
+  
+  # Añadimos las etiquetas y leyendas
+  labs(x = "Dias", y = "Nivel sonoro medio",
+       title ="Nivel sonoro por dia") 
+  #Aplicamos ggplotly para que el gráfico sea interactivo
+  ggplotly(g_dsonoro,tooltip = c("x", "y"))
+```
 
