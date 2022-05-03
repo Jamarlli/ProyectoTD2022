@@ -302,16 +302,30 @@ ggplotly(g_diassemana,tooltip = c("x", "y"))
 ```
 
 ```{r}
-df %>% filter(str_detect(Franja_horaria, "h")) %>% mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>%
-  group_by(Franja_horaria,Dia_semana) %>% mutate(Nivel_por_dia = mean(Nivel_sonoro)) %>% 
-  #Se seleccionan solo las columnas necesarias
-  select(Franja_horaria,Nivel_por_dia, Dia_semana) %>% distinct() %>% 
+# Funcion para crear un id numerico del dia de la semana y poder hacer un grafico animado
+id_ds <- function(x){
+  match(x,c("lunes","martes","miércoles","jueves","viernes","sábado","domingo"))
+}
+
+# Adaptamos el df a nuestras necesidades
+df %>% filter(str_detect(Franja_horaria, "h")) %>% 
+  mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>% 
+  group_by(Dia_semana,Franja_horaria) %>% 
+  mutate(Nivel_por_dia = mean(Nivel_sonoro), id_ds = id_ds(Dia_semana)) %>% 
+  
+#Se seleccionan solo las columnas necesarias
+  select(Franja_horaria,Nivel_por_dia, Dia_semana,id_ds) %>% distinct() %>% 
+  
   ggplot(aes(x=Dia_semana,y=Nivel_por_dia,col=Franja_horaria,group=Franja_horaria)) + 
-  geom_point() + 
-  geom_line() +
-  #Se añaden las etiquetas y el título
+
+  geom_line(size=1) +
+  
+#Se añaden las etiquetas y el título
   labs(x = "Días de la semana", y = "Nivel sonoro",
-       title ="Nivel sonoro por franja horaria y día de la semana")
+       title ="Nivel sonoro por franja horaria y día de la semana") + transition_reveal(id_ds) +
+  
+  # Escogemos los colores concretos
+  scale_fill_manual(values = c("#F4D03F", "#7DCEA0", "#1B4F72","#935116"))
 
 ```
 
