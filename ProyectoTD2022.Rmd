@@ -342,3 +342,41 @@ df %>% filter(str_detect(Franja_horaria, "h")) %>%
 
 ```
 
+###Correlation overview
+
+```{r}
+
+library(corrplot)
+
+df %>%
+
+  select(-id, -id_sensor, -Fecha_dato) %>%
+  
+   mutate(Franja_horaria = fct_recode(Franja_horaria,
+
+           "0" = "1min",
+
+           "1" = "Dia 7-19h",
+           
+           "2" = "Dia_tarde_noche",
+
+           "3" = "Tarde 19-23h",
+           
+           "4" = "Noche 23-7h")
+
+        ) %>%
+
+  mutate(Dia_medidas = as.numeric(Dia_medidas),
+
+         Estacion = as.numeric(Estacion),
+
+         Franja_horaria = as.numeric(Franja_horaria),
+
+         Nivel_sonoro = as.numeric(Nivel_sonoro)) %>%
+        
+         ggpairs()
+
+
+```
+
+
