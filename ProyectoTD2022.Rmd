@@ -25,7 +25,7 @@ monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 # Especificamos las librerías necesarias en esta lista
 
-packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate","gganimate")
+packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate","gganimate","corrplot","GGally")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -234,10 +234,12 @@ g_nsonoro <- df %>% group_by(Estacion) %>%
   
   # Añadimos las etiquetas y leyendas
   labs(x = "Estaciones", y = "Nivel sonoro medio",
-       title ="Nivel sonoro por estación") 
+       title ="Nivel sonoro por estación")
+
   #Aplicamos ggplotly para que el gráfico sea interactivo
-  ggplotly(g_nsonoro,tooltip = c("x", "y"))
+  ggplotly(g_nsonoro,tooltip = c("x", "y")) 
 ```
+
 ```{r}
 #Otra forma de ponerlo podría ser mediante boxplots
 
@@ -346,8 +348,6 @@ df %>% filter(str_detect(Franja_horaria, "h")) %>%
 
 ```{r}
 
-library(corrplot)
-
 df %>%
 
   select(-id, -id_sensor, -Fecha_dato) %>%
@@ -415,6 +415,7 @@ g_msonoro <- df %>% mutate(Dia_medidas = months(as.Date(Dia_medidas))) %>%  grou
   # Añadimos las etiquetas y leyendas
   labs(x = "Meses", y = "Nivel sonoro medio",
        title ="Nivel sonoro por mes") 
+
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_msonoro,tooltip = c("x", "y"))
 ```
