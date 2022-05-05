@@ -335,6 +335,8 @@ df %>% filter(str_detect(Franja_horaria, "h")) %>%
 
   geom_line(size=1) +
   
+  
+  
 #Se añaden las etiquetas y el título
   labs(x = "Días de la semana", y = "Nivel sonoro",
        title ="Nivel sonoro por franja horaria y día de la semana") + transition_reveal(id_ds) +
@@ -399,22 +401,28 @@ g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  gr
   ggplotly(g_dsonoro,tooltip = c("x", "y"))
 ```
 
-### Nivel sonoro medio por mes
+### Nivel sonoro por mes (Con limite segun la OMS)
 ```{r}
-# Seleccionamos la media del nivel sonoro por mes y el mes
+# Seleccionamos el nivel sonoro por mes y el mes
 g_msonoro <- df %>% mutate(Dia_medidas = months(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% 
-  mutate(Media = mean(Nivel_sonoro)) %>% 
-  select(Dia_medidas, Media) %>% unique() %>% 
+  select(Dia_medidas, Nivel_sonoro) %>% unique() %>% 
   
-  # Hacemos un grafico de barras con ambas variables, de manera que el color 
-  # dependa del nivel sonoro medio y añadimos limites al eje x para que se vea 
-  # mejor la diferencia del nivel sonoro entre dias
-  ggplot() + geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
-  coord_cartesian(ylim=c(50, 70)) + 
+  # Hacemos un grafico de puntos con ambas variables, de manera que el color 
+  # dependa del nivel sonoro
+  ggplot() + #geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
+  geom_jitter(aes(x= Dia_medidas, y = Nivel_sonoro, col = Nivel_sonoro)) +
+  
+  # Añadimos una linea horizontal a la altura del Nivel sonoro con el cual 
+  # comienza el riesgo de perdida auditiva crónica y otra a la altura del nivel 
+  # de ruido recomendado para una vida sana, ambas segun la OMS
+  geom_hline(yintercept=85, linetype="dashed", color = "red") +
+  geom_hline(yintercept=65, linetype="dashed", color = "blue") +
+  
   
   # Añadimos las etiquetas y leyendas
   labs(x = "Meses", y = "Nivel sonoro medio",
-       title ="Nivel sonoro por mes") 
+       title ="Nivel sonoro por mes") + 
+  scale_color_gradient(low="green", high="red")
 
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_msonoro,tooltip = c("x", "y"))
