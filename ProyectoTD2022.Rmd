@@ -300,23 +300,6 @@ g_nsonorofh <- df %>% group_by(Franja_horaria) %>%
 
 #### Nivel sonoro por dia de la semana
 ```{r}
-#Se crea una columna con los días de la semana y se ordenan empezando por el lunes
-g_diassemana <- df %>% 
-  mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>%
-  #Se seleccionan solo las columnas necesarias, el nivel sonoro y los días de la semana
-  select(Nivel_sonoro, Dia_semana) %>% 
-  #Se utiliza el boxplot para visualizar el mínimo, el máximo, la mediana, los cuantiles y los outliers para cada día de la semana
-  ggplot() + geom_boxplot(aes(x = Dia_semana, y = Nivel_sonoro)) + 
-  #Se gira el gráfico para una mejor visualización de los datos
-  coord_flip() +
-  #Se añaden las etiquetas y el título
-  labs(x = "Días de la semana", y = "Nivel sonoro",
-       title ="Nivel sonoro por día de la semana")
-#Se utiliza ggplotly para que el gráfico sea interactivo
-ggplotly(g_diassemana,tooltip = c("x", "y"))
-```
-
-```{r}
 # Funcion para crear un id numerico del dia de la semana y poder hacer un grafico animado
 id_ds <- function(x){
   match(x,c("lunes","martes","miércoles","jueves","viernes","sábado","domingo"))
@@ -427,3 +410,18 @@ g_msonoro <- df %>% mutate(Dia_medidas = months(as.Date(Dia_medidas))) %>%  grou
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_msonoro,tooltip = c("x", "y"))
 ```
+### Nivel sonoro mascletà
+```{r}
+#Filtramos para la franja horaria de la mascletà y creamos una nueva columna para determinar qué día hubo mascletà
+g_mascleta <- df %>% filter(Franja_horaria == "Dia 7-19h") %>% mutate(hubomascleta = ((Dia_medidas >= as.Date("2021-09-01") & Dia_medidas <= as.Date("2021-09-05")) | Dia_medidas >= as.Date("2022-03-01") & Dia_medidas <= as.Date("2022-03-19"))) %>% 
+
+#Creamos los boxplots, de forma que se divida por estaciones y el color dependa de si hubo o no mascletà
+ggplot(aes(x = Estacion, y = Nivel_sonoro, color = hubomascleta)) + geom_boxplot() +
+
+#Ponemos las etiquetas y el título  
+labs(x = "Estación", y = "Nivel sonoro", title = "Nivel sonoro con y sin mascletà por estación")
+
+#Utilizamos ggplotly para que el gráfico sea interactivo, con la función layout agrupando por "boxmode" para que no se superpongan los boxplots
+ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group")
+```
+
