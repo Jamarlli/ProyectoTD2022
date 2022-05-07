@@ -365,19 +365,30 @@ df %>%
 ```
 
 
-### Nivel sonoro medio por dia
+### Nivel sonoro medio por dia(Con nivel de concentración)
 ```{r}
+# Seleccionamos el nivel sonoro por día de la semana y el dia
 g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% select(Dia_medidas, Nivel_sonoro) %>% unique()
 
+# Hacemos un grafico de violin con ambas variables, de manera que el color 
+# dependa del día
 g_dsonoro2 <- ggplot(data = g_dsonoro, aes(x = Dia_medidas,y = Nivel_sonoro)) +
   geom_jitter(size = 1, color = 'gray', alpha = 0.5) +
   geom_violin(aes(fill = Dia_medidas), color = 'black', alpha = 0.8) +
-  geom_boxplot(color = 'black', alpha = 0.7) +
-  xlab('Género') + 
-  ylab('Puntuación de la Audiencia') +
-  ggtitle('Puntuación de la Audiencia según el Género') + 
+geom_boxplot(color = 'black', alpha = 0.9) +
+  
+# Añadimos una linea horizontal a la altura del Nivel sonoro 
+# con el cual el nivel sonoro empieza a afectar a nuestra 
+# concentración
+  geom_hline(yintercept=70, linetype="dashed", color = "red") +
+  
+# Añadimos las etiquetas y leyendas
+  xlab('Días de la semana') + 
+  ylab('Nivel sonoro') +
+  ggtitle('Nivel sonoro por días de la semana') + 
   theme_minimal()
 
+#Aplicamos ggplotly para que el gráfico sea interactivo
 ggplotly(g_dsonoro2,tooltip = c("x", "y"))
 ```
 
