@@ -364,24 +364,21 @@ df %>%
 
 ```
 
+
 ### Nivel sonoro medio por dia
 ```{r}
-# Seleccionamos la media del nivel sonoro por día de la semana y el dia de la semana
-g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% 
-  mutate(Media = mean(Nivel_sonoro)) %>% 
-  select(Dia_medidas, Media) %>% unique() %>% 
-  
-  # Hacemos un grafico de barras con ambas variables, de manera que el color 
-  # dependa del nivel sonoro medio y añadimos limites al eje x para que se vea 
-  # mejor la diferencia del nivel sonoro entre dias
-  ggplot() + geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
-  coord_cartesian(ylim=c(50, 70)) + 
-  
-  # Añadimos las etiquetas y leyendas
-  labs(x = "Dias", y = "Nivel sonoro medio",
-       title ="Nivel sonoro por dia") 
-  #Aplicamos ggplotly para que el gráfico sea interactivo
-  ggplotly(g_dsonoro,tooltip = c("x", "y"))
+g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% select(Dia_medidas, Nivel_sonoro) %>% unique()
+
+g_dsonoro2 <- ggplot(data = g_dsonoro, aes(x = Dia_medidas,y = Nivel_sonoro)) +
+  geom_jitter(size = 1, color = 'gray', alpha = 0.5) +
+  geom_violin(aes(fill = Dia_medidas), color = 'black', alpha = 0.8) +
+  geom_boxplot(color = 'black', alpha = 0.7) +
+  xlab('Género') + 
+  ylab('Puntuación de la Audiencia') +
+  ggtitle('Puntuación de la Audiencia según el Género') + 
+  theme_minimal()
+
+ggplotly(g_dsonoro2,tooltip = c("x", "y"))
 ```
 
 ### Nivel sonoro por mes (Con limite segun la OMS)
