@@ -418,6 +418,33 @@ g_msonoro <- df %>% mutate(Dia_medidas = months(as.Date(Dia_medidas))) %>%  grou
   #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_msonoro,tooltip = c("x", "y"))
 ```
+
+### Nivel sonoro por estación del año
+```{r}
+#Eliminamos el año del día de medidas y creamos una columna
+#que almacena las estaciones del año para cada medida
+g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Est_anyo = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% 
+
+#Hacemos un gráfico de puntos y un gráfico de violín
+#de manera que el color dependa de la estación del año
+ggplot(aes(x = Est_anyo, y = Nivel_sonoro)) + geom_jitter(aes(color = Est_anyo), alpha = 0.05) + geom_violin(aes(fill = Est_anyo), color = "black", alpha = 0.8) + 
+
+  #Añadimos una línea horizontal marcando el umbral a partir del cual el ruido comienza a ser dañino
+  geom_hline(yintercept=75, linetype="dashed", color = "red") +
+  #Y otra marcando el umbral a partir del cual el sonido se considera ruido según la OMS
+  geom_hline(yintercept=65, linetype="dashed", color = "darkblue") + 
+  
+  #Añadimos etiquetas y título
+  labs(x = "Estaciones del año", y = "Nivel sonoro",
+       title ="Nivel sonoro por estación del año")
+
+#Aplicamos ggplotly para que el gráfico sea interactivo
+ggplotly(g_estanyo,tooltip = c("x", "y"))
+
+#CORREGIR ERROR LEYENDA
+```
+
+
 ### Nivel sonoro mascletà
 ```{r}
 #Filtramos para la franja horaria de la mascletà y creamos una nueva columna para determinar qué día hubo mascletà
@@ -432,4 +459,4 @@ labs(x = "Estación", y = "Nivel sonoro", title = "Nivel sonoro con y sin mascle
 #Utilizamos ggplotly para que el gráfico sea interactivo, con la función layout agrupando por "boxmode" para que no se superpongan los boxplots
 ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group")
 ```
-
+Nota: no hay datos de días de mascletà en la estación 5.
