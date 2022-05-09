@@ -398,15 +398,16 @@ meses <-c("enero","febrero","marzo","abril","mayo","junio","julio","agosto",
           "septiembre","octubre","noviembre","diciembre")
 
 # Seleccionamos el nivel sonoro por mes, el mes y el año
-g_msonoro <- df  %>% mutate(anyo = year(as.Date(Dia_medidas))) %>% 
+df_msonoro <- df  %>% mutate(anyo = year(as.Date(Dia_medidas))) %>% 
   mutate(Dia_medidas = factor(months(as.Date(Dia_medidas))),levels(meses)) %>%  group_by(Dia_medidas) %>%  
   select(Dia_medidas, Nivel_sonoro,anyo)
 
-
+# Ordenamos los meses
+df_msonoro$Dia_medidas <- factor(df_msonoro$Dia_medidas, levels = meses, ordered = T)
   
-  # Hacemos un grafico de puntos con ambas variables, de manera que el color 
-  # dependa del nivel sonoro
-  ggplot(g_msonoro) + #geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
+# Hacemos un grafico de puntos con ambas variables, de manera que el color 
+# dependa del nivel sonoro
+g_msonoro <- ggplot(df_msonoro) + #geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
   geom_jitter(aes(x= Dia_medidas, y = Nivel_sonoro, col = Nivel_sonoro)) +
   
   # Añadimos una linea horizontal a la altura del Nivel sonoro con el cual 
@@ -420,14 +421,16 @@ g_msonoro <- df  %>% mutate(anyo = year(as.Date(Dia_medidas))) %>%
   labs(x = "Meses", y = "Nivel sonoro medio",
        title ="Nivel sonoro por mes") + 
   scale_color_gradient(low="green", high="red") +
+  # Giramos el angulo de los meses
   theme(axis.text = element_text(angle = 45))+
   
+  # Dividimos en años
   facet_grid(.~anyo)
 
 
 
 #Aplicamos ggplotly para que el gráfico sea interactivo
-#ggplotly(g_msonoro,tooltip = c("x", "y"))
+ggplotly(g_msonoro,tooltip = c("x", "y"))
 ```
 
 Como vemos en el grafico solo se superó el umbral del nivel sonoro cuandos e celebraron las fallas (un año no hubo, el siguiente hubo en septiembre y el siguiente en marzo)
