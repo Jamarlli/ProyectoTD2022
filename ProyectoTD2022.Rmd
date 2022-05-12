@@ -123,7 +123,7 @@ for(x in 2:14){
 Utilizamos funciones como summary, head... Para asi tener una idea de como están
 distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
 
-```{r}
+```{r,echo=T, message = F, error = F, warning = F}
 # La función summary nos da una visualización de las columnas, sus clases y 
 # otras informaciones
 summary(df)
@@ -322,7 +322,10 @@ df %>% filter(str_detect(Franja_horaria, "h")) %>%
   
 #Se añaden las etiquetas y el título
   labs(x = "Días de la semana", y = "Nivel sonoro",
-       title ="Nivel sonoro por franja horaria y día de la semana") + transition_reveal(id_ds) +
+       title ="Nivel sonoro por franja horaria y día de la semana") + 
+  
+  #Convertimos el grafico en animado
+  transition_reveal(id_ds) +
   
   # Escogemos los colores concretos
   scale_fill_manual(values = c("#F4D03F", "#7DCEA0", "#1B4F72","#935116"))
@@ -418,19 +421,16 @@ g_msonoro <- ggplot(df_msonoro) + #geom_col(aes(x= Dia_medidas, y = Media, fill 
   
   
   # Añadimos las etiquetas y leyendas
-  labs(x = "Meses", y = "Nivel sonoro medio",
+  labs(x = "", y = "Nivel sonoro medio",
        title ="Nivel sonoro por mes") + 
   scale_color_gradient(low="green", high="red") +
   # Giramos el angulo de los meses
-  theme(axis.text = element_text(angle = 45))+
+  theme(axis.text = element_text(angle = 90))+
   
   # Dividimos en años
   facet_grid(.~anyo)
 
-
-
-#Aplicamos ggplotly para que el gráfico sea interactivo
-ggplotly(g_msonoro,tooltip = c("x", "y"))
+g_msonoro
 ```
 
 Como vemos en el grafico solo se superó el umbral del nivel sonoro cuandos e celebraron las fallas (un año no hubo, el siguiente hubo en septiembre y el siguiente en marzo)
@@ -462,7 +462,7 @@ ggplotly(g_estanyo,tooltip = c("x", "y"))
 
 
 ### Nivel sonoro mascletà
-```{r}
+```{r,echo=T, message = F, error = F, warning = F}
 #Filtramos para la franja horaria de la mascletà y creamos una nueva columna para determinar qué día hubo mascletà
 g_mascleta <- df %>% filter(Franja_horaria == "Dia 7-19h") %>% mutate(hubomascleta = ((Dia_medidas >= as.Date("2021-09-01") & Dia_medidas <= as.Date("2021-09-05")) | Dia_medidas >= as.Date("2022-03-01") & Dia_medidas <= as.Date("2022-03-19"))) %>% 
 
@@ -475,4 +475,4 @@ labs(x = "Estación", y = "Nivel sonoro", title = "Nivel sonoro con y sin mascle
 #Utilizamos ggplotly para que el gráfico sea interactivo, con la función layout agrupando por "boxmode" para que no se superpongan los boxplots
 ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group")
 ```
-Nota: no hay datos de días de mascletà en la estación 5.
+Nota: no hay datos de días de mascletà en la ``nombre_estaciones[4]`` (Estacion 5).
