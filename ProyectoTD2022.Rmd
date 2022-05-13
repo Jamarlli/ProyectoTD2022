@@ -1,6 +1,6 @@
 ---
 title: "ProyectoTD2022"
-author: "Grupo K"
+author: "Javier Martínez, Miguel Caurín y Carlos Gila - Grupo K"
 date: '2022-04-19'
 output:
 # Salida html 
@@ -439,7 +439,7 @@ Como vemos en el grafico solo se superó el umbral del nivel sonoro cuandos e ce
 ```{r}
 #Eliminamos el año del día de medidas y creamos una columna
 #que almacena las estaciones del año para cada medida
-g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Est_anyo = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% 
+g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Est_anyo = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% unique() %>% 
 
 #Hacemos un gráfico de puntos y un gráfico de violín
 #de manera que el color dependa de la estación del año
@@ -454,10 +454,7 @@ ggplot(aes(x = Est_anyo, y = Nivel_sonoro)) + geom_jitter(aes(color = Est_anyo),
   labs(x = "Estaciones del año", y = "Nivel sonoro",
        title ="Nivel sonoro por estación del año")
 
-#Aplicamos ggplotly para que el gráfico sea interactivo
-ggplotly(g_estanyo,tooltip = c("x", "y"))
-
-#CORREGIR ERROR LEYENDA
+g_estanyo
 ```
 
 
