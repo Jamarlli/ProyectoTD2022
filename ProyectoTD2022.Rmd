@@ -21,11 +21,12 @@ Este proyecto en R está enfocado a analizar los datos recogidos por sensores qu
 monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 ### Instalación de paquetes necesarios:
-```{r,echo=T, message = F, error = F, warning = F}
+```{r,echo=F, message = F, error = F, warning = F}
 
 # Especificamos las librerías necesarias en esta lista
 
-packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate","gganimate","corrplot","GGally")
+packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate",
+             "gganimate","corrplot","GGally","knitr","kableExtra")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -86,7 +87,6 @@ nombre_estaciones <-
 ```{r}
 # Creamos un vector con los nombres de los ficheros (sin el ".csv")
 nombres <- paste0('df',1:14)
-nombres
 
 # Con un bucle for y mediante la funcion assign() le asignamos a cada nombre del 
 # vector su data frame correspondiente, leido del fichero con la función read_csv
@@ -126,7 +126,11 @@ distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla
 ```{r,echo=T, message = F, error = F, warning = F}
 # La función summary nos da una visualización de las columnas, sus clases y 
 # otras informaciones
-summary(df)
+n <- df %>% select(recvTime,LAeq,LAeq_d,LAeq_den,LAeq_e,LAeq_n,dateObserved) %>% summarise(Min = min(x),"1st Qu"= quantile(df$LAeq,probs = 0.25,names=F),Median=median(x),Mean=mean(x),"3rd Qu"=quantile(df$LAeq,probs = 0.75,names=F),Max=max(x))
+
+
+
+a <- as.data.frame(n) %>% separate(Freq,sep = ":",into = c("a","b")) %>% select(-Var1) %>% mutate(Var2 = as.factor(Var2),a=as.factor(a)) %>%  spread(a, b,-Var2) #%>% kable(col.names = c("c","Min", "1st Qu", "Median","Mean","3rd Qu","Max"),caption = "Summary") %>%  kable_styling()
 
 # La función glimpse de el paquete dplyr nos da una visualización rapida del 
 # dataframe que estamos tratando.
@@ -134,8 +138,7 @@ glimpse(df)
 
 # Por ultimo la función head nos muestra las primeras filas del df para hacernos
 # una idea real
-head(as.data.frame(df))
-
+knitr::kable(head(as.data.frame(df)))
 ```
 
 ### Preguntas que se puedan responder con los datos disponibles
@@ -163,7 +166,7 @@ head(as.data.frame(df))
 
 ### Eliminar datos innecesarios
 
-```{r}
+```{r,results = 'hide'}
 # Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos 
 # columnas que no varian, por lo tanto, podemos eliminarlas del df
 all(df$entityType == "NoiseLevelObserved")
@@ -173,7 +176,7 @@ df<- df[,-(3:4)]
 ```
 ### Renombrar las variables
 
-```{r}
+```{r,results = 'hide'}
 # Otra cosa de gran importancia es que los nombres de las columnas deben ser 
 # representativos y se deben poder entender. Por ello le vamos a cambiar los 
 # nombres a unos más simples
@@ -192,18 +195,19 @@ colnames(df)<- c("id","Fecha_dato","id_sensor","1min","Dia 7-19h",
 df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 
 # Finalmente visualizamos el data frame "df" tidy
-head(as.data.frame(df))
+knitr::kable(head(as.data.frame(df)))
 ```
+
 ### Ajustes extra de las variables
 
 ```{r}
-min(df$Nivel_sonoro) 
-max(df$Nivel_sonoro) # No puede haber registros con un Nivel sonoro infinito
-which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
+min <- min(df$Nivel_sonoro) 
+(max <- max(df$Nivel_sonoro)) # No puede haber registros con un Nivel sonoro infinito
+pos <- which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
 
 # Dado que hay dos registros con un Nivel Sonoro con valor de Infinito, 
 # los reemplazamos por la media del resto de registros
-df$Nivel_sonoro[which(df$Nivel_sonoro==Inf)]<-mean(df$Nivel_sonoro[-which(df$Nivel_sonoro==Inf)])
+df$Nivel_sonoro[pos]<-mean(df$Nivel_sonoro[-pos])
 
 # Convertimos la estación a factor
 df <- df %>% mutate(Estacion = as.factor(Estacion))
@@ -252,7 +256,9 @@ ggplot(df, aes(Estacion, Nivel_sonoro, colour = Estacion)) +
        title ="Nivel sonoro por estación")
   
 ```
+
 #### Niveles sonoros máximos y minimos de cada estación
+
 ```{r}
 # Seleccionamos los máximos y mínimos de cada estación y la estación
 g_maxmin <- df %>% group_by(Estacion) %>% 
@@ -369,7 +375,7 @@ df %>%
 
 
 ### Nivel sonoro medio por dia(Con nivel de concentración)
-```{r}
+```{r,warning=F}
 # Seleccionamos el nivel sonoro por día de la semana y el dia
 g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% select(Dia_medidas, Nivel_sonoro) %>% unique()
 
