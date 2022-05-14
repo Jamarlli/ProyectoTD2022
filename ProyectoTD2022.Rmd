@@ -244,119 +244,128 @@ df <- df %>% mutate(Franja_horaria = as.factor(Franja_horaria))
 ### Graficos
 
 #### Nivel sonoro por estación
+
+Seleccionamos la media del nivel sonoro por estación y la estación. Hacemos un 
+grafico de barras con ambas variables, de manera que el color dependa del nivel
+sonoro medio y añadimos limites al eje x para que se vea mejor la diferencia del
+nivel sonoro entre estaciones. Finalmente añadimos las etiquetas y leyendas y 
+aplicamos ggplotly para que el gráfico sea interactivo.
+
 ```{r}
-# Seleccionamos la media del nivel sonoro por estación y la estación
 g_nsonoro <- df %>% group_by(Estacion) %>% 
   mutate(Media = mean(Nivel_sonoro)) %>% 
   select(Estacion, Media) %>% unique() %>% 
   
-  # Hacemos un grafico de barras con ambas variables, de manera que el color 
-  # dependa del nivel sonoro medio y añadimos limites al eje x para que se vea 
-  # mejor la diferencia del nivel sonoro entre estaciones
   ggplot() + geom_col(aes(x= Estacion, y = Media, fill = Media)) + 
   coord_cartesian(ylim=c(50, 70)) + 
   
-  # Añadimos las etiquetas y leyendas
   labs(x = "Estaciones", y = "Nivel sonoro medio",
        title ="Nivel sonoro por estación")
 
-  #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_nsonoro,tooltip = c("x", "y")) 
 ```
 
-```{r}
-#Otra forma de ponerlo podría ser mediante boxplots
 
-#Primero seleccionamos que dos variables queremos comparar
+Otra forma interesante de ponerlo podría ser mediante boxplots. Primero 
+seleccionamos que dos variables queremos comparar y ponemos que el color dependa
+de las estaciones. Finalmente añadimos las etiquetas y leyendas.
+
+```{r}
 ggplot(df, aes(Estacion, Nivel_sonoro, colour = Estacion)) +
   geom_boxplot() +
   scale_y_log10() + 
-  #Añadimos las etiquetas y leyendas
   labs(x = "Estaciones", y = "Nivel sonoro medio",
        title ="Nivel sonoro por estación")
   
 ```
 
+
 #### Niveles sonoros máximos y minimos de cada estación
 
+Seleccionamos los máximos y mínimos de cada estación y la estación. Al crear las
+variables minimo y maximo hay que volver a hacer tidy el data frame. Hacemos un
+grafico de barras con las variables Estacion, Valor y Medida y agrupando 
+visualmente por estaciones con el argumento position. Finalmente añadimos las 
+etiquetas y leyendas y aplicamos ggplotly para que el gráfico sea interactivo.
+
 ```{r}
-# Seleccionamos los máximos y mínimos de cada estación y la estación
 g_maxmin <- df %>% group_by(Estacion) %>% 
   mutate(minimo = min(Nivel_sonoro), maximo = max(Nivel_sonoro)) %>% 
   select(Estacion, maximo, minimo) %>%
   unique() %>%
-  gather(key = Medida, value =Valor,-Estacion) %>% # Al crear las variables 
-                                                   # minimo y maximo hay que 
-                                                   # volver a hacer tidy el 
-                                                   # data frame
+  gather(key = Medida, value =Valor,-Estacion) %>% 
   
-  # Hacemos un grafico de barras con las variables Estacion, Valor y Medida y 
-  # agrupando visualmente por estaciones con el argumento position
   ggplot() + 
   geom_col(aes(x = Estacion,y=Valor, fill=Medida), position = position_dodge(width = 0.65)) + 
   
-  #Añadimos las etiquetas y leyendas
   labs(x = "Estaciones", y = "Nivel sonoro",
        title ="Niveles sonoros mínimos y máximos por estación")
   
-  #Aplicamos ggplotly para que el gráfico sea interactivo
   ggplotly(g_maxmin)
 ```
 
 
-
 #### Nivel sonoro por franja horaria
+
+Se selecciona la media del nivel sonoro para cada franja horaria y la propia 
+franja horaria, agrupando por esta última. Se hace un gráfico de barras con ambas
+variables, de manera que el color dependa del nivel sonoro medio. Se añaden 
+límites en el eje x para que se aprecie mejor la diferencia de nivel sonoro en 
+cada franja horaria.Finalmente añadimos las etiquetas y leyendas y aplicamos 
+ggplotly para que el gráfico sea interactivo.
+
 ```{r}
-#Se selecciona la media del nivel sonoro para cada franja horaria y la propia franja horaria, agrupando por esta última
+
 g_nsonorofh <- df %>% group_by(Franja_horaria) %>% 
   mutate(Media = mean(Nivel_sonoro)) %>% 
   select(Franja_horaria, Media) %>% unique() %>% 
-  #Se hace un gráfico de barras con ambas variables, de manera que el color dependa del nivel sonoro medio 
   ggplot() + geom_col(aes(x = Franja_horaria, y = Media, fill = Media)) + 
   scale_fill_gradient(name = "nivel", low = "mediumpurple4", high = "mediumorchid") +
-  #Se añaden límites en el eje x para que se aprecie mejor la diferencia de nivel sonoro en cada franja horaria
+
   coord_cartesian(ylim=c(50, 65)) +
-  #Se añaden las etiquetas y el título
+
   labs(x = "Franjas horarias", y = "Nivel sonoro medio",
        title ="Nivel sonoro por franja horaria") 
 
-  #Se utiliza ggplotly para que el gráfico sea interactivo
   ggplotly(g_nsonorofh,tooltip = c("x", "y"))
 ```
 
+
 #### Nivel sonoro por dia de la semana
+
+Primero hacemos una funcion para crear un id numerico del dia de la semana y 
+asi poder hacer un grafico animado. Posteriormente adaptamos el df a nuestras 
+necesidadesy seleccionamos solo las columnas necesarias. Por último, se añaden 
+las etiquetas y el título, convertimos el grafico en animado y escogemos los 
+colores concretos.
+
 ```{r}
-# Funcion para crear un id numerico del dia de la semana y poder hacer un grafico animado
 id_ds <- function(x){
   match(x,c("lunes","martes","miércoles","jueves","viernes","sábado","domingo"))
 }
 
-# Adaptamos el df a nuestras necesidades
 df %>% filter(str_detect(Franja_horaria, "h")) %>% 
   mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>% 
   group_by(Dia_semana,Franja_horaria) %>% 
   mutate(Nivel_por_dia = mean(Nivel_sonoro), id_ds = id_ds(Dia_semana)) %>% 
   
-#Se seleccionan solo las columnas necesarias
   select(Franja_horaria,Nivel_por_dia, Dia_semana,id_ds) %>% distinct() %>% 
   
   ggplot(aes(x=Dia_semana,y=Nivel_por_dia,col=Franja_horaria,group=Franja_horaria)) + 
-
   geom_line(size=1) +
   
   
-  
-#Se añaden las etiquetas y el título
   labs(x = "Días de la semana", y = "Nivel sonoro",
        title ="Nivel sonoro por franja horaria y día de la semana") + 
   
-  #Convertimos el grafico en animado
+
   transition_reveal(id_ds) +
   
-  # Escogemos los colores concretos
+
   scale_fill_manual(values = c("#F4D03F", "#7DCEA0", "#1B4F72","#935116"))
 
 ```
+
 
 ###Correlation overview
 
@@ -394,66 +403,67 @@ df %>%
 ```
 
 
-### Nivel sonoro medio por dia(Con nivel de concentración)
+### Nivel sonoro medio por dia (Con nivel de concentración)
+
+Primero seleccionamos el nivel sonoro por día de la semana y el dia. Después 
+hacemos un grafico de violin con ambas variables, de manera que el color dependa
+del día. Añadimos una linea horizontal a la altura del Nivel sonoro con el cual
+empieza a afectar a nuestra concentración para aportar un valor extra al gráfico.
+Finalmente añadimos las etiquetas y leyendas y aplicamos ggplotly para que el 
+gráfico sea interactivo.
+
 ```{r,warning=F}
-# Seleccionamos el nivel sonoro por día de la semana y el dia
 g_dsonoro <- df %>% mutate(Dia_medidas = weekdays(as.Date(Dia_medidas))) %>%  group_by(Dia_medidas) %>% select(Dia_medidas, Nivel_sonoro) %>% unique()
 
-# Hacemos un grafico de violin con ambas variables, de manera que el color 
-# dependa del día
 g_dsonoro2 <- ggplot(data = g_dsonoro, aes(x = Dia_medidas,y = Nivel_sonoro)) +
   geom_jitter(size = 1, color = 'gray', alpha = 0.5) +
   geom_violin(aes(fill = Dia_medidas), color = 'black', alpha = 0.8) +
 geom_boxplot(color = 'black', alpha = 0.9) +
   
-# Añadimos una linea horizontal a la altura del Nivel sonoro 
-# con el cual el nivel sonoro empieza a afectar a nuestra 
-# concentración
   geom_hline(yintercept=70, linetype="dashed", color = "red") +
-  
-# Añadimos las etiquetas y leyendas
+
   xlab('Días de la semana') + 
   ylab('Nivel sonoro') +
   ggtitle('Nivel sonoro por días de la semana') + 
   theme_minimal()
 
-#Aplicamos ggplotly para que el gráfico sea interactivo
 ggplotly(g_dsonoro2,tooltip = c("x", "y"))
 ```
 
+
 ### Nivel sonoro por mes (Con limite segun la OMS)
+
+Primero seleccionamos el nivel sonoro por mes, el mes y el año. Ordenamos los 
+meses. Hacemos un grafico de puntos con ambas variables, de manera que el color 
+dependa del nivel sonoro. Añadimos una linea horizontal a la altura del Nivel 
+sonoro con el cual comienza el riesgo de perdida auditiva crónica y otra a la 
+altura del nivel de ruido recomendado para una vida sana, ambas segun la OMS.
+Por último, añadimos las etiquetas y leyendas, giramos el angulo de los meses 
+para que se puedan leer correctamente en el eje x y dividimos en años.
+
 ```{r}
 meses <-c("enero","febrero","marzo","abril","mayo","junio","julio","agosto",
           "septiembre","octubre","noviembre","diciembre")
 
-# Seleccionamos el nivel sonoro por mes, el mes y el año
 df_msonoro <- df  %>% mutate(anyo = year(as.Date(Dia_medidas))) %>% 
   mutate(Dia_medidas = factor(months(as.Date(Dia_medidas))),levels(meses)) %>%  group_by(Dia_medidas) %>%  
   select(Dia_medidas, Nivel_sonoro,anyo)
 
-# Ordenamos los meses
 df_msonoro$Dia_medidas <- factor(df_msonoro$Dia_medidas, levels = meses, ordered = T)
   
-# Hacemos un grafico de puntos con ambas variables, de manera que el color 
-# dependa del nivel sonoro
 g_msonoro <- ggplot(df_msonoro) + #geom_col(aes(x= Dia_medidas, y = Media, fill = Media)) + 
   geom_jitter(aes(x= Dia_medidas, y = Nivel_sonoro, col = Nivel_sonoro)) +
   
-  # Añadimos una linea horizontal a la altura del Nivel sonoro con el cual 
-  # comienza el riesgo de perdida auditiva crónica y otra a la altura del nivel 
-  # de ruido recomendado para una vida sana, ambas segun la OMS
   geom_hline(yintercept=85, linetype="dashed", color = "red") +
   geom_hline(yintercept=65, linetype="dashed", color = "blue") +
   
-  
-  # Añadimos las etiquetas y leyendas
+
   labs(x = "", y = "Nivel sonoro medio",
        title ="Nivel sonoro por mes") + 
   scale_color_gradient(low="green", high="red") +
-  # Giramos el angulo de los meses
+
   theme(axis.text = element_text(angle = 90))+
   
-  # Dividimos en años
   facet_grid(.~anyo)
 
 g_msonoro
@@ -461,22 +471,24 @@ g_msonoro
 
 Como vemos en el grafico solo se superó el umbral del nivel sonoro cuandos e celebraron las fallas (un año no hubo, el siguiente hubo en septiembre y el siguiente en marzo)
 
-### Nivel sonoro por estación del año
+
+### Nivel sonoro por estación del año (con valores extra)
+
+Primeramente eliminamos el año del día de medidas y creamos una columna que 
+almacena las estaciones del año para cada medida. Hacemos un gráfico de puntos y
+un gráfico de violín de manera que el color dependa de la estación del año.
+Añadimos una línea horizontal marcando el umbral a partir del cual el ruido 
+comienza a ser dañino y otra marcando el umbral a partir del cual el sonido se 
+considera ruido según la OMS. Finalmente añadimos etiquetas y título. 
+
 ```{r}
-#Eliminamos el año del día de medidas y creamos una columna
-#que almacena las estaciones del año para cada medida
 g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Est_anyo = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% unique() %>% 
 
-#Hacemos un gráfico de puntos y un gráfico de violín
-#de manera que el color dependa de la estación del año
 ggplot(aes(x = Est_anyo, y = Nivel_sonoro)) + geom_jitter(aes(color = Est_anyo), alpha = 0.05) + geom_violin(aes(fill = Est_anyo), color = "black", alpha = 0.8) + 
 
-  #Añadimos una línea horizontal marcando el umbral a partir del cual el ruido comienza a ser dañino
   geom_hline(yintercept=75, linetype="dashed", color = "red") +
-  #Y otra marcando el umbral a partir del cual el sonido se considera ruido según la OMS
   geom_hline(yintercept=65, linetype="dashed", color = "darkblue") + 
   
-  #Añadimos etiquetas y título
   labs(x = "Estaciones del año", y = "Nivel sonoro",
        title ="Nivel sonoro por estación del año")
 
@@ -485,17 +497,24 @@ g_estanyo
 
 
 ### Nivel sonoro mascletà
+
+Primero filtramos para la franja horaria de la mascletà y creamos una nueva 
+columna para determinar qué día hubo mascletà. Creamos los boxplots, de forma 
+que se divida por estaciones y el color dependa de si hubo o no mascletà.
+Finalmente ponemos las etiquetas y el título y utilizamos ggplotly para que el 
+gráfico sea interactivo, con la función layout agrupando por "boxmode" para que 
+no se superpongan los boxplots.
+
 ```{r,echo=T, message = F, error = F, warning = F}
-#Filtramos para la franja horaria de la mascletà y creamos una nueva columna para determinar qué día hubo mascletà
 g_mascleta <- df %>% filter(Franja_horaria == "Dia 7-19h") %>% mutate(hubomascleta = ((Dia_medidas >= as.Date("2021-09-01") & Dia_medidas <= as.Date("2021-09-05")) | Dia_medidas >= as.Date("2022-03-01") & Dia_medidas <= as.Date("2022-03-19"))) %>% 
 
-#Creamos los boxplots, de forma que se divida por estaciones y el color dependa de si hubo o no mascletà
 ggplot(aes(x = Estacion, y = Nivel_sonoro, color = hubomascleta)) + geom_boxplot() +
 
-#Ponemos las etiquetas y el título  
 labs(x = "Estación", y = "Nivel sonoro", title = "Nivel sonoro con y sin mascletà por estación")
 
-#Utilizamos ggplotly para que el gráfico sea interactivo, con la función layout agrupando por "boxmode" para que no se superpongan los boxplots
 ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group")
 ```
+
 Nota: no hay datos de días de mascletà en la ``nombre_estaciones[4]`` (Estacion 5).
+
+
