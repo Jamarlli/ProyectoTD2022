@@ -60,8 +60,11 @@ search()
 13. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Doctor Serrano, 21
 14. Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle General Prim Chaflán Donoso Cortés
 
+
+- Creamos un vector con los nombres de las estaciones para poder acceder a ellos
+  por si fuese necesario.
+
 ```{r}
-# Creamos un vector con los nombres de las estaciones para poder acceder a ellos si es necesario
 nombre_estaciones <- 
   c("Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Sueca Esq. Denia",
   "Datos diarios del sensor de ruido ubicado en el barrio de Ruzafa, en la calle Cádiz, 16",
@@ -84,6 +87,14 @@ nombre_estaciones <-
 
 ### Importar los datos
 
+Creamos un vector con los nombres de los ficheros (sin el ".csv"). Con un bucle 
+for y mediante la funcion assign() le asignamos a cada nombre del vector su data
+frame correspondiente, leido del fichero con la función read_csv. Si se quisiera 
+comprobar el estado de los data frames tras la importación se usaria la funcion
+head(), que muestra las primeras columnas de un dataframe (dado que ocupa mucho 
+espacio en el html/pdf y no aporta gran informacion al corrector esta parte esta
+comentada).
+
 ```{r}
 # Creamos un vector con los nombres de los ficheros (sin el ".csv")
 nombres <- paste0('df',1:14)
@@ -96,23 +107,21 @@ for(x in nombres){
                                        col_datetime(format = "%Y-%m-%d"))))
 }
 
-# Si se quisiera comprobar el estado de los data frames tras la importación se 
-# usaria la funcion head(), que muestra las primeras columnas de un dataframe 
-# (dado que ocupa mucho espacio en el html/pdf y no aporta gran informacion al 
-# corrector esta parte esta comentada)
 vector_dfs <- list(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12,df13,df14)
 # for (x in 1:14){print(head(as.data.frame(vector_dfs[[x]]),n=1))}
 ```
+
 ### Fusionar todos los datos en un solo dataframe
 
+Creamos un data frame("df") equivalente al df1 con una columna añadida que dice 
+de que estación proviene cada registro (en el primer caso todos provienen de la 1).
+Con un bucle vamos haciendole joins a df añadiendo toda la informacion del resto 
+de data frames, incluyendo en todos la nueva columna que indica en que estación 
+se han recogido los datos.
+
 ```{r,echo=T, message = F, error = F, warning = F}
-# Creamos un data frame("df") equivalente al df1 con una columna añadida que 
-# dice de que estación proviene cada registro (en este caso todos provienen de la 1)
 df <- df1 %>% mutate(df1,Estacion = 1)
 
-# Con un bucle vamos haciendole joins a df añadiendo toda la informacion del 
-# resto de data frames, incluyendo en todos la nueva columna que indica en que 
-# estación se han recogido los datos
 for(x in 2:14){
   df <- full_join(df,mutate(vector_dfs[[x]],Estacion = x))
 }
@@ -122,26 +131,30 @@ for(x in 2:14){
 
 Utilizamos funciones como summary, head... Para asi tener una idea de como están
 distribuidos nuestros datos y de esta forma trabajar de una manera más sencilla.
+La función summary nos da una visualización de las columnas, sus clases y otras 
+informaciones.
+La función glimpse de el paquete dplyr nos da una visualización rapida del 
+dataframe que estamos tratando.
+Por ultimo la función head nos muestra las primeras filas del df para hacernos 
+una idea real.
 
 ```{r,echo=T, message = F, error = F, warning = F}
-# La función summary nos da una visualización de las columnas, sus clases y 
-# otras informaciones
 n <- df %>% select(recvTime,LAeq,LAeq_d,LAeq_den,LAeq_e,LAeq_n,dateObserved) %>% summarise(Min = min(x),"1st Qu"= quantile(df$LAeq,probs = 0.25,names=F),Median=median(x),Mean=mean(x),"3rd Qu"=quantile(df$LAeq,probs = 0.75,names=F),Max=max(x))
 
 
 
 a <- as.data.frame(n) %>% separate(Freq,sep = ":",into = c("a","b")) %>% select(-Var1) %>% mutate(Var2 = as.factor(Var2),a=as.factor(a)) %>%  spread(a, b,-Var2) #%>% kable(col.names = c("c","Min", "1st Qu", "Median","Mean","3rd Qu","Max"),caption = "Summary") %>%  kable_styling()
 
-# La función glimpse de el paquete dplyr nos da una visualización rapida del 
-# dataframe que estamos tratando.
 glimpse(df)
 
-# Por ultimo la función head nos muestra las primeras filas del df para hacernos
-# una idea real
 knitr::kable(head(as.data.frame(df)))
 ```
 
 ### Preguntas que se puedan responder con los datos disponibles
+
+- Ahora vamos a plantear unas preguntas premiliminares que se puedan responder 
+  con los datos disponibles. Si más adelante aparecen nuevas preguntas que puedan
+  parecer interesantes las iremos añadiendo.
 
 ¿En qué franja horaria el nivel sonoro es más alto? ¿Y el más bajo?
 ¿En qué sensor el nivel sonoro es más alto? ¿Y el más bajo?
@@ -166,9 +179,11 @@ knitr::kable(head(as.data.frame(df)))
 
 ### Eliminar datos innecesarios
 
+Por las previsualizaciones que hemos realizado en el apartado anterior podemos 
+darnos cuenta de que hay dos columnas que no varian, por lo tanto, podemos 
+eliminarlas del df. Ya que no aportan ningún valor relevante a este estudio.
+
 ```{r,results = 'hide'}
-# Por las previsualizaciones anteriores podemos darnos cuenta de que hay dos 
-# columnas que no varian, por lo tanto, podemos eliminarlas del df
 all(df$entityType == "NoiseLevelObserved")
 all(df$fiwareServicePath == "/sonometros")
 
@@ -176,11 +191,11 @@ df<- df[,-(3:4)]
 ```
 ### Renombrar las variables
 
-```{r,results = 'hide'}
-# Otra cosa de gran importancia es que los nombres de las columnas deben ser 
-# representativos y se deben poder entender. Por ello le vamos a cambiar los 
-# nombres a unos más simples
+Otra cosa de gran importancia es que los nombres de las columnas deben ser 
+representativos y se deben poder entender. Por ello les vamos a cambiar los 
+nombres a unos más simples y comprensibles.
 
+```{r,results = 'hide'}
 colnames(df)
 colnames(df)<- c("id","Fecha_dato","id_sensor","1min","Dia 7-19h",
                  "Dia_tarde_noche", "Tarde 19-23h", "Noche 23-7h", 
@@ -189,33 +204,38 @@ colnames(df)<- c("id","Fecha_dato","id_sensor","1min","Dia 7-19h",
 
 ### Representamos las variables en columnas y las observaciones en filas
 
+De esta forma también nos podemos dar cuenta de que hay unas variables puestas 
+como columnas, y para que sea tidy le hemos de dar la vuelta. Ya que cada 
+variable ha de estar representada en una columna.
+Finalmente visualizamos el data frame "df" tidy
+
 ```{r}
-# De esta forma también nos podemos dar cuenta de que hay unas variables puestas 
-# como columnas
 df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 
-# Finalmente visualizamos el data frame "df" tidy
 knitr::kable(head(as.data.frame(df)))
 ```
 
 ### Ajustes extra de las variables
 
+No puede haber registros con un Nivel sonoro infinito, por lo que seleccionamos 
+la posicion de los registros con Nivel_sonoro = Inf. Dado que hay dos registros 
+con un Nivel Sonoro con valor de Infinito, los reemplazamos por la media del 
+resto de registros.
+Convertimos la estación a factor.
+Convertimos la Fecha_dato a fecha.
+Convertimos la Franja horaria a factor.
+
 ```{r}
 min <- min(df$Nivel_sonoro) 
-(max <- max(df$Nivel_sonoro)) # No puede haber registros con un Nivel sonoro infinito
-pos <- which(df$Nivel_sonoro==Inf) # posicion de los registros con Nivel_sonoro = Inf
+(max <- max(df$Nivel_sonoro)) 
+pos <- which(df$Nivel_sonoro==Inf)
 
-# Dado que hay dos registros con un Nivel Sonoro con valor de Infinito, 
-# los reemplazamos por la media del resto de registros
 df$Nivel_sonoro[pos]<-mean(df$Nivel_sonoro[-pos])
 
-# Convertimos la estación a factor
 df <- df %>% mutate(Estacion = as.factor(Estacion))
 
-#Convertimos la Fecha_dato a fecha
 df <- df %>% mutate(Fecha_dato = as.Date(Fecha_dato))
 
-# Convertimos la Franja horaria a factor
 df <- df %>% mutate(Franja_horaria = as.factor(Franja_horaria))
 ```
 
