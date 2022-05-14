@@ -21,10 +21,10 @@ Este proyecto en R está enfocado a analizar los datos recogidos por sensores qu
 monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 ### Instalación de paquetes necesarios:
+
+Especificamos las librerías necesarias en una lista.
+
 ```{r,echo=F, message = F, error = F, warning = F}
-
-# Especificamos las librerías necesarias en esta lista
-
 packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate",
              "gganimate","corrplot","GGally","knitr","kableExtra")
 
