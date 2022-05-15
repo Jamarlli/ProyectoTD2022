@@ -83,6 +83,26 @@ nombre_estaciones <-
 
 ```
 
+- Creamos un vector con los nombres de las estaciones pero más corto y funcional.
+
+```{r}
+nombre_estaciones_corto <- 
+  c(" Sueca Esq. Denia",
+  " Cádiz, 16",
+  " Cádiz, 3",
+  " Cuba, 3",
+  " Sueca, 2",
+  " Sueca, 61",
+  " Sueca, 32",
+  " Carles Cervera, Chaflán Reina Doña María",
+  " Salvador Abril Chaflán Maestro José Serrano",
+  " Vivons Chaflán Cádiz",
+  " Carles Cervera, 34",
+  " Puerto Rico, 21",
+  " Doctor Serrano, 21",
+  " General Prim Chaflán Donoso Cortés")
+
+```
 ## Fase 4
 
 ### Importar los datos
