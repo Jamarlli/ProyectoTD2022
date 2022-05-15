@@ -178,9 +178,48 @@ kable(head(df)) %>% kable_styling(bootstrap_options = c("striped","bordered","ho
   parecer interesantes las iremos añadiendo.
 
 ¿En qué franja horaria el nivel sonoro es más alto? ¿Y el más bajo?
-¿En qué sensor el nivel sonoro es más alto? ¿Y el más bajo?
-¿En qué día el nivel sonoro fue más alto? ¿Y el más bajo?
+
+La franja horaria con el nivel sonoro más alto es la franja de Dia/Tarde/noche 
+rondando los 65 dB. En cambio la franja horaria con el nivel sonoro más bajo es 
+la de la noche desde las 23 hasta las 7. A pesar de ser la franja con nivel 
+sonoro más bajo es bastante alto si tenemos en cuenta que la legislación europea
+establece los niveles másximos de ruido hasta los 45 dB durante la noche.
+
+
+¿En qué sensor el nivel sonoro registrado es más alto? ¿Y el más bajo?
+
+El sensor que ha llegado a detectar el nivel sonoro más alto fue el ubicado en 
+la estación 8 y por otra parte el sensor que llegó a detectar el nivel sonoro 
+más bajo es el ubicado en la estacion 11.
+
+¿En qué sensor el nivel sonoro medio es más alto? ¿Y el más bajo?
+
+En cambio si no nos fijamos en los máximos y en los mínimos, nos encotramos que
+la estacion que mayor nivel sonoro medio es la 3 y por el contrario, la estación
+que tiene menor nivel sonoro medio es la 14. Esto puede ser debido por a que haya
+más bares, discotecas, puntos de encuentro... 
+
+¿En qué día de la semana el nivel sonoro es más alto de media? ¿Y el más bajo?
+
+El día de la semana que tiene un nivel sonoro más alto es es sábado. Es un suceso
+que lo podríamos llegar a intuir ya que la gente tiene más tiempo libre, hay más
+desplazamientos, más fiestas...
+En cambio el dia que tiene menor nivel sonoro es el lunes. Esto puede ser porque 
+la gente vuelve a la jornada laboral y han tenido suficiente ocio el finde semana.
+
+En cambio si hablamos de que días se han llegado a registrar los niveles sonoros
+máximos más altos y bajos, los días cambian. Tenemos que el domingo ha tenido el 
+registro de nivel sonoro máximo más alto y el mártes es el día con el nivel sonoro
+máximo más bajo.
+
 ¿En qué mes el nivel sonoro es más alto? ¿Y el más bajo?
+
+El mes con nivel sonoro más alto de 2021 es septiembre y el más bajo es febrero.
+En cambio el mes con nivel sonoro más alto cambia en 2022 a marzo.
+Este dato es muy interesante ya que podemos observar como afectan las Fallas al 
+nivel sonoro. Ya que en 2021 las Fallas se hicieron en septiembre a causa del
+COVID-19. En cambio, en 2022 se realizaron con total normalidad en marzo. Así se 
+reflejado en la gráfica de nivel sonoro por mes.
 
 ¿El nivel de ruido depende del día de la semana?
 ¿El nivel de ruido depende del mes?
@@ -188,11 +227,23 @@ kable(head(df)) %>% kable_styling(bootstrap_options = c("striped","bordered","ho
 ¿El nivel de ruido depende de la parte del mes en la que estemos (principios, mediados, finales)?
 
 ¿Qué franjas horarias tienen los niveles de ruido más parecidos?
-¿Qué días de la semana tienen los niveles de ruido más parecidos?
-¿Qué meses tienen los niveles de ruido más parecidos?
 
+
+¿Qué días de la semana tienen los niveles de ruido más parecidos?
+
+Los días de la semana que tienen los niveles de ruido más parecidos son el sabado
+y domingo como días en los que más nivel sonoro hay. Y es obvio pensar que es 
+porque la gente dispone de más tiempo de ocio. Así por el contrario el lunes y
+martes también tienen unos niveles bastante parecidos ya que son los inicios de 
+la semana y la gente tiene obligaciones que hacer.
+
+¿Qué meses tienen los niveles de ruido más parecidos?
 ¿Los niveles de ruido son más altos los fines de semana?
 ¿Se producen cambios en el nivel de ruido en épocas festivas?
+
+Esta pregunta se puede responder por si sola con la pregunta de niveles máximos 
+por mes, ya que se ha podido comprobar como afecta a la gráfica la epoca de Fallas.
+
 ¿En qué medida el nivel de ruido depende del sensor que lo mide?
 
 
