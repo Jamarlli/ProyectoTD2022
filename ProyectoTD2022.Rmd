@@ -608,21 +608,26 @@ Nota: no hay datos de días de mascletà en la en la calle Sueca (Estacion 5).
 
 ## Conclusiones Finales
 
-Para finalizar el estudio vamos a mostrar a las conslusiones que hemos podido 
-llegargracias al estudio de los datos recogidos por los sonómetros ubicados en 
-Ruzafa. Y esque es curioso la cantidad de informaciçon y conclusiones que puedes 
-llegar a sacar dependiendo del enfoque que le des a estos datos.
+Para finalizar el estudio mostraremos las conclusiones a las que hemos podido 
+llegar gracias al estudio de los datos recogidos por los sonómetros ubicados en 
+Ruzafa. Llama la atención la cantidad de información y conclusiones que se
+pueden llegar a sacar dependiendo del enfoque que se le dé a estos datos.
 
-Por ejemplo, desde el punto de vista de emprendimiento, puedes ver dónde es la 
-mejor ubicación de abrir un negocio, ya que podemos relacionar el nivel sonoro 
-con la cantidad de personas que afluentan esa zona. En este caso te convendría 
+Por ejemplo, desde el punto de vista de emprendimiento, se puede ver cuál es la 
+mejor ubicación para abrir un negocio, ya que podemos relacionar el nivel sonoro 
+con la cantidad de personas que afluentan esa zona. En este caso, convendría 
 abrirlo en la estación 3, Calle Cádiz, 3.
 
-En cambio si lo ves desde el punto de vista de tu bien estar, no te conviene 
-tener tu apartamento en esa estación, sino todo lo contrario, para que no afecte 
-ni a tus niveles de concentración ni de sueño. Es decir, te convendría tener el 
-apartamento en la estación 14, Calle General Prim Chaflán Donoso Cortés.
+En cambio, si se ve desde el punto de vista del bienestar, no conviene tener
+un apartamento en esta estación, más bien todo lo contrario, para que no afecte 
+ni a los niveles de concentración ni a los de sueño. Es decir, convendría
+tener el apartamento en la estación 14, Calle General Prim Chaflán Donoso Cortés.
 
-Otra de las grandes conclusiones que podemos sacar es la dependencia del Barrio 
-Ruzafa de la hostelería y el ocío, ya que los niveles sonoros salen disparados 
-los dias de fin de semana, cuando la gente tiene más tiempo libre.
+Otra de las grandes conclusiones que se puede sacar es la dependencia del Barrio 
+Ruzafa de la hostelería y el ocio, ya que los niveles sonoros salen disparados 
+los días de fin de semana, cuando la gente tiene más tiempo libre.
+
+Otra conclusión interesante que se puede extraer, es la contaminación acústica
+del barrio, puesto que prácticamente todos los días se supera el umbral de sonido
+a partir del cuál comienza la pérdida auditiva crónica, así como el de la pérdida
+de concentración y el de ruido en general, según la OMS.
