@@ -159,15 +159,16 @@ Por ultimo la función head nos muestra las primeras filas del df para hacernos
 una idea real.
 
 ```{r,echo=T, message = F, error = F, warning = F}
-n <- df %>% select(recvTime,LAeq,LAeq_d,LAeq_den,LAeq_e,LAeq_n,dateObserved) %>% summarise(Min = min(x),"1st Qu"= quantile(df$LAeq,probs = 0.25,names=F),Median=median(x),Mean=mean(x),"3rd Qu"=quantile(df$LAeq,probs = 0.75,names=F),Max=max(x))
+summ <- df %>% select(recvTime,LAeq,LAeq_d,LAeq_den,LAeq_e,LAeq_n,dateObserved) %>% 
+  summary() %>% as.data.frame() %>% 
+  select(-Var1) %>% separate(col = Freq, into = c("h","i"),sep=":") %>% 
+  pivot_wider(names_from = h,values_from = i)
 
+kable(summ) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 
+#g <- glimpse(df)
 
-a <- as.data.frame(n) %>% separate(Freq,sep = ":",into = c("a","b")) %>% select(-Var1) %>% mutate(Var2 = as.factor(Var2),a=as.factor(a)) %>%  spread(a, b,-Var2) #%>% kable(col.names = c("c","Min", "1st Qu", "Median","Mean","3rd Qu","Max"),caption = "Summary") %>%  kable_styling()
-
-glimpse(df)
-
-knitr::kable(head(as.data.frame(df)))
+kable(head(df)) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 ```
 
 ### Preguntas que se puedan responder con los datos disponibles
@@ -232,7 +233,7 @@ Finalmente visualizamos el data frame "df" tidy
 ```{r}
 df <-gather(df, key= Franja_horaria, value= Nivel_sonoro ,4:8)
 
-knitr::kable(head(as.data.frame(df)))
+kable(head(df)) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 ```
 
 ### Ajustes extra de las variables
@@ -257,6 +258,11 @@ df <- df %>% mutate(Estacion = as.factor(Estacion))
 df <- df %>% mutate(Fecha_dato = as.Date(Fecha_dato))
 
 df <- df %>% mutate(Franja_horaria = as.factor(Franja_horaria))
+
+#ordenamos los levels de Franja_horaria
+
+df$Franja_horaria <- factor(df$Franja_horaria, 
+                            levels = c("Dia 7-19h","Tarde 19-23h","Noche 23-7h","Dia_tarde_noche","1min"))
 ```
 
 ## Fase 6
@@ -336,7 +342,7 @@ ggplotly para que el gráfico sea interactivo.
 
 ```{r}
 
-g_nsonorofh <- df %>% group_by(Franja_horaria) %>% 
+df %>% group_by(Franja_horaria) %>% 
   mutate(Media = mean(Nivel_sonoro)) %>% 
   select(Franja_horaria, Media) %>% unique() %>% 
   ggplot() + geom_col(aes(x = Franja_horaria, y = Media, fill = Media)) + 
@@ -345,9 +351,11 @@ g_nsonorofh <- df %>% group_by(Franja_horaria) %>%
   coord_cartesian(ylim=c(50, 65)) +
 
   labs(x = "Franjas horarias", y = "Nivel sonoro medio",
-       title ="Nivel sonoro por franja horaria") 
+       title ="Nivel sonoro por franja horaria") +
+  transition_states(Franja_horaria, wrap = FALSE) +
+  shadow_mark()  +
+  enter_fade()
 
-  ggplotly(g_nsonorofh,tooltip = c("x", "y"))
 ```
 
 
@@ -364,7 +372,7 @@ id_ds <- function(x){
   match(x,c("lunes","martes","miércoles","jueves","viernes","sábado","domingo"))
 }
 
-df %>% filter(str_detect(Franja_horaria, "h")) %>% 
+df %>% 
   mutate(Dia_semana = fct_reorder(weekdays(Dia_medidas), wday(Dia_medidas, week_start = 1))) %>% 
   group_by(Dia_semana,Franja_horaria) %>% 
   mutate(Nivel_por_dia = mean(Nivel_sonoro), id_ds = id_ds(Dia_semana)) %>% 
@@ -379,45 +387,7 @@ df %>% filter(str_detect(Franja_horaria, "h")) %>%
        title ="Nivel sonoro por franja horaria y día de la semana") + 
   
 
-  transition_reveal(id_ds) +
-  
-
-  scale_fill_manual(values = c("#F4D03F", "#7DCEA0", "#1B4F72","#935116"))
-
-```
-
-
-###Correlation overview
-
-```{r}
-
-df %>%
-
-  select(-id, -id_sensor, -Fecha_dato) %>%
-  
-   mutate(Franja_horaria = fct_recode(Franja_horaria,
-
-           "0" = "1min",
-
-           "1" = "Dia 7-19h",
-           
-           "2" = "Dia_tarde_noche",
-
-           "3" = "Tarde 19-23h",
-           
-           "4" = "Noche 23-7h")
-
-        ) %>%
-
-  mutate(Dia_medidas = as.numeric(Dia_medidas),
-
-         Estacion = as.numeric(Estacion),
-
-         Franja_horaria = as.numeric(Franja_horaria),
-
-         Nivel_sonoro = as.numeric(Nivel_sonoro)) %>%
-        
-         ggpairs()
+  transition_reveal(id_ds)
 
 
 ```
@@ -445,7 +415,8 @@ geom_boxplot(color = 'black', alpha = 0.9) +
   xlab('Días de la semana') + 
   ylab('Nivel sonoro') +
   ggtitle('Nivel sonoro por días de la semana') + 
-  theme_minimal()
+  theme(legend.position ="none")
+
 
 ggplotly(g_dsonoro2,tooltip = c("x", "y"))
 ```
@@ -502,9 +473,9 @@ comienza a ser dañino y otra marcando el umbral a partir del cual el sonido se
 considera ruido según la OMS. Finalmente añadimos etiquetas y título. 
 
 ```{r}
-g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Est_anyo = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% unique() %>% 
+g_estanyo <- df %>% mutate(Dia_medidas = format(Dia_medidas, format="%m-%d")) %>% mutate(Estacion = ifelse(Dia_medidas >= "03-20" & Dia_medidas <= "06-21", "Primavera", ifelse(Dia_medidas >= "06-21" & Dia_medidas <= "09-22", "Verano", ifelse(Dia_medidas >= "09-22" & Dia_medidas <= "12-21", "Otoño", ifelse(Dia_medidas >= "12-21" & Dia_medidas <= "12-31" | Dia_medidas >= "01-01" & Dia_medidas <= "03-20", "Invierno", NA))))) %>% unique() %>% 
 
-ggplot(aes(x = Est_anyo, y = Nivel_sonoro)) + geom_jitter(aes(color = Est_anyo), alpha = 0.05) + geom_violin(aes(fill = Est_anyo), color = "black", alpha = 0.8) + 
+ggplot(aes(x = Estacion, y = Nivel_sonoro)) + geom_jitter(aes(color = Estacion), alpha = 0.05) + geom_violin(aes(fill = Estacion), color = "black", alpha = 0.8) + 
 
   geom_hline(yintercept=75, linetype="dashed", color = "red") +
   geom_hline(yintercept=65, linetype="dashed", color = "darkblue") + 
@@ -535,6 +506,6 @@ labs(x = "Estación", y = "Nivel sonoro", title = "Nivel sonoro con y sin mascle
 ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group")
 ```
 
-Nota: no hay datos de días de mascletà en la ``nombre_estaciones[4]`` (Estacion 5).
+Nota: no hay datos de días de mascletà en la en la calle Sueca (Estacion 5).
 
 
