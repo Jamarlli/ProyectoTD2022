@@ -24,9 +24,11 @@ monitorizan el nivel de ruido en diferentes localizaciones del barrio de Ruzafa.
 
 Especificamos las librerías necesarias en una lista.
 
+
 ```{r,echo=F, message = F, error = F, warning = F}
 packages = c("tidyverse","knitr","ggplot2","readr","plotly","lubridate",
-             "gganimate","corrplot","GGally","knitr","kableExtra")
+             "gganimate","corrplot","GGally","knitr","kableExtra","leaflet",
+             "shiny","RColorBrewer","xts","rgdal","plotrix")
 
 #use this function to check if each package is on the local machine
 #if a package is installed, it will be loaded
@@ -604,6 +606,219 @@ ggplotly(g_mascleta,tooltip = c("x", "y", "color")) %>% layout(boxmode = "group"
 ```
 
 Nota: no hay datos de días de mascletà en la en la calle Sueca (Estacion 5).
+
+
+### Mapa interactivo de las estaciones
+
+Creamos los subconujuntos de datos que usaremos en las diferentes capas del mapa
+```{r}
+dfmedia <- df %>% 
+  group_by(Estacion) %>% 
+  mutate(media = mean(Nivel_sonoro)) %>% select(Estacion,media) %>% 
+  unique() %>% mutate(media=round(media,2))
+
+dffallas_2021 <-df %>% 
+  filter(Dia_medidas >= as.Date("2021-09-01")) %>% 
+  filter(Dia_medidas<=as.Date("2021-09-05")) %>% group_by(Estacion) %>% 
+  mutate(fallas_2021 = mean(Nivel_sonoro)) %>% select(Estacion,fallas_2021) %>% 
+  unique()%>% mutate(fallas_2021=round(fallas_2021,2))
+
+dffallas_2022 <-df %>% 
+  filter(Dia_medidas >= as.Date("2022-03-15")) %>% 
+  filter(Dia_medidas<=as.Date("2022-03-19")) %>% group_by(Estacion) %>% 
+  mutate(fallas_2022 = mean(Nivel_sonoro)) %>% select(Estacion,fallas_2022) %>% 
+  unique()%>% mutate(fallas_2022=round(fallas_2022,2))
+
+dfmaxi <-df %>% 
+  select(Nivel_sonoro,Estacion) %>% 
+  group_by(Estacion) %>% 
+  mutate(maxi = max(Nivel_sonoro)) %>% select(Estacion,maxi) %>% 
+  unique()%>% mutate(maxi=round(maxi,2))
+
+dfmini <-df %>% 
+  select(Nivel_sonoro,Estacion) %>% 
+  group_by(Estacion) %>% 
+  mutate(mini = min(Nivel_sonoro)) %>% select(Estacion,mini) %>% 
+  unique()%>% mutate(mini=round(mini,2))
+
+```
+
+
+Creamos un dataframe con latitud, longitud y nombre de las estaciones
+```{r}
+lat <- c(39.462685,
+         39.463460,
+         39.463938,
+         39.46258714943458,
+         39.46330306451391,
+         39.45984035747688,
+         39.461359278727315,
+         39.46104687570253,
+         39.46347855632092,
+         39.46000008564762,
+         39.46150290594316,
+         39.46122554234543,
+         39.46267814413545,39.46252226439023)
+
+lon <- c(-0.375963,
+         -0.374725,
+         -0.375067, 
+         -0.3774455293876197, 
+         -0.3765849281924387, 
+         -0.37377849367407356, 
+         -0.37517753933555137, 
+         -0.37274573892832225,
+         -0.3706286483806198, 
+         -0.3721377888232703, 
+         -0.3728233607255255, 
+         -0.3757247291124665,
+         -0.3739598445556998, 
+         -0.3703693446010307)
+
+nom<- c("calle Sueca Esq. Denia",
+        "calle Cádiz, 16",
+        "calle Cádiz, 3",
+        "calle Cuba, 3",
+        "calle Sueca, 2",
+        "calle Sueca, 61",
+        "calle Sueca, 32",
+        "calle Carles Cervera, Chaflán Reina Doña María",
+        "calle Salvador Abril Chaflán Maestro José Serrano",
+        "calle Vivons Chaflán Cádiz",
+        "calle Carles Cervera, 34",
+        "Calle Puerto Rico, 21",
+        "Calle Dr. Serrano, 21",
+        "calle General Prim Chaflán Donoso Cortés")
+
+mapita <- data.frame(Nombre = nom,Latitud = lat,Longitud = lon,Estacion = 1:14) %>% mutate(Estacion = as.factor(Estacion))
+```
+
+
+Unimos dicho dataframe a los subconjuntos previamente calculados
+```{r}
+mapa <- mapita %>% 
+  inner_join(y=dfmedia,by=c("Estacion")) %>% 
+  inner_join(y=dffallas_2021,by=c("Estacion")) %>% 
+  inner_join(y=dffallas_2022,by=c("Estacion")) %>% 
+  inner_join(y=dfmaxi,by=c("Estacion")) %>% 
+  inner_join(y=dfmini,by=c("Estacion"))
+```
+
+
+Creamos las funciones de coloreado para los ajustes de los iconos (para que el color varie en funcion del nivel sonoro)
+```{r}
+colorear <- function(Nivel_sonoro) {
+  if(Nivel_sonoro <= 47){
+    "lightgreen"
+  } else if(Nivel_sonoro <= 62) {
+    "green"
+  } else if(Nivel_sonoro <= 77) {
+    "orange"
+  } else if(Nivel_sonoro <= 92) {
+    "red"
+  } else{
+    "darkred"
+  } }
+
+getColorMedia <- function(mapa) {
+  sapply(mapa$media, colorear)
+}
+getColorF21 <- function(mapa) {
+  sapply(mapa$fallas_2021, colorear)
+}
+getColorF22 <- function(mapa) {
+  sapply(mapa$fallas_2022, colorear)
+}
+getColorMax <- function(mapa) {
+  sapply(mapa$maxi, colorear)
+}
+getColorMin <- function(mapa) {
+  sapply(mapa$mini, colorear)
+}
+```
+
+
+Creamos las funciones de los ajustes de los iconos para las estaciones del mapa (Usando las funciones de coloreado)
+```{r}
+iconsmedia <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'white',
+  library = 'ion',
+  markerColor = getColorMedia(mapa)
+)
+
+iconsf21 <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'white',
+  library = 'ion',
+  markerColor = getColorF21(mapa)
+)
+
+iconsf22 <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'white',
+  library = 'ion',
+  markerColor = getColorF22(mapa)
+)
+
+iconsmax <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'white',
+  library = 'ion',
+  markerColor = getColorMax(mapa)
+)
+
+iconsmin <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'white',
+  library = 'ion',
+  markerColor = getColorMin(mapa)
+)
+```
+
+
+Creamos las funciones del titulo
+```{r}
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title { 
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px; 
+    padding-right: 10px; 
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 18px;
+  }
+"))
+
+title <- tags$div(
+  tag.map.title, HTML("Sensores de ruido de Ruzafa")
+)  
+
+```
+
+Creamos el mapa añadiendo capas de marcadores con la latitud y longitud del dataframe y con los valores de los diferentes subconjuntos. Creamos capas para separar los datos de cada subconjunto y añadimos un titulo (usando las funciones del titulo definidas previamente)
+```{r}
+leaflet(data = mapa) %>% addTiles() %>%
+  addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsmedia, label=~as.character(mapa$media), group = "Media") %>% 
+  addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsf21, label=~as.character(mapa$fallas_2021), group = "Fallas 2021") %>% 
+  addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsf22, label=~as.character(mapa$fallas_2022), group = "Fallas 2022") %>% 
+  addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsmax, label=~as.character(mapa$maxi), group = "Maximo") %>% 
+  addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsmin, label=~as.character(mapa$mini), group = "Minimo") %>% 
+  
+  #Creamos las capas
+  addLayersControl(
+    baseGroups = c("Media", "Fallas 2021", "Fallas 2022","Maximo","Minimo"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  
+  
+  
+  #Añadimos el titulo
+  addControl(title, position = "topleft", className="map-title") 
+```
 
 
 ## Conclusiones Finales
