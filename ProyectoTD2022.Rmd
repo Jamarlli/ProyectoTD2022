@@ -118,11 +118,8 @@ espacio en el html/pdf y no aporta gran informacion al corrector esta parte esta
 comentada).
 
 ```{r}
-# Creamos un vector con los nombres de los ficheros (sin el ".csv")
 nombres <- paste0('df',1:14)
 
-# Con un bucle for y mediante la funcion assign() le asignamos a cada nombre del 
-# vector su data frame correspondiente, leido del fichero con la función read_csv
 for(x in nombres){
   assign(x,read_csv(str_c("data/",x,".csv"), 
                     col_types = cols(dateObserved = 
@@ -260,6 +257,12 @@ bajos, aunque cuentan con algún pico durante las épocas festivas.
 
 ¿Qué franjas horarias tienen los niveles de ruido más parecidos?
 
+La franja horaria del día de 7 a 19 tiene una correlación muy alta con la franja
+1min y la franja día-tarde-noche.
+
+Por el contrario, las que tienen una menor correlación, son el día y la noche,
+como se podría suponer, ya que el día es el momento en el que el nivel sonoro es más
+elevado, y la noche es el momento en el que es más bajo.
 
 ¿Qué días de la semana tienen los niveles de ruido más parecidos?
 
