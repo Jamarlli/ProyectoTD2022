@@ -273,7 +273,12 @@ la semana y la gente tiene obligaciones que hacer.
 
 ¿Los niveles de ruido son más altos los fines de semana?
 
-Los días de la semana con picos más altos de sonido son sábado y domingo, y el sábado se mantiene estable como el día con el nivel más alto, pero en general, los domingos baja su intensidad, probablemente porque muchos negocios cierran este día. Por tanto, en general, se puede decir que los niveles de sonido no suben los fines de semana, aunque en momentos puntuales (generalmente festivos), son los días con una mayor intensidad.
+Los días de la semana con picos más altos de sonido son sábado y domingo, y el 
+sábado se mantiene estable como el día con el nivel más alto, pero en general, 
+los domingos baja su intensidad, probablemente porque muchos negocios cierran 
+este día. Por tanto, en general, se puede decir que los niveles de sonido no suben
+los fines de semana, aunque en momentos puntuales (generalmente festivos), son los
+días con una mayor intensidad.
 
 ¿Se producen cambios en el nivel de ruido en épocas festivas?
 
@@ -653,7 +658,8 @@ Nota: no hay datos de días de mascletà en la en la calle Sueca (Estacion 5).
 
 ### Mapa interactivo de las estaciones
 
-Creamos los subconujuntos de datos que usaremos en las diferentes capas del mapa
+Creamos los subconujuntos de datos que usaremos en las diferentes capas del mapa.
+
 ```{r}
 dfmedia <- df %>% 
   group_by(Estacion) %>% 
@@ -687,7 +693,8 @@ dfmini <-df %>%
 ```
 
 
-Creamos un dataframe con latitud, longitud y nombre de las estaciones
+Creamos un dataframe con latitud, longitud y nombre de las estaciones.
+
 ```{r}
 lat <- c(39.462685,
          39.463460,
@@ -737,7 +744,8 @@ mapita <- data.frame(Nombre = nom,Latitud = lat,Longitud = lon,Estacion = 1:14) 
 ```
 
 
-Unimos dicho dataframe a los subconjuntos previamente calculados
+Unimos dicho dataframe a los subconjuntos previamente calculados.
+
 ```{r}
 mapa <- mapita %>% 
   inner_join(y=dfmedia,by=c("Estacion")) %>% 
@@ -748,7 +756,9 @@ mapa <- mapita %>%
 ```
 
 
-Creamos las funciones de coloreado para los ajustes de los iconos (para que el color varie en funcion del nivel sonoro)
+Creamos las funciones de coloreado para los ajustes de los iconos (para que el 
+color varie en funcion del nivel sonoro).
+
 ```{r}
 colorear <- function(Nivel_sonoro) {
   if(Nivel_sonoro <= 47){
@@ -781,7 +791,9 @@ getColorMin <- function(mapa) {
 ```
 
 
-Creamos las funciones de los ajustes de los iconos para las estaciones del mapa (Usando las funciones de coloreado)
+Creamos las funciones de los ajustes de los iconos para las estaciones del mapa 
+(Usando las funciones de coloreado)
+
 ```{r}
 iconsmedia <- awesomeIcons(
   icon = 'ios-close',
@@ -820,7 +832,8 @@ iconsmin <- awesomeIcons(
 ```
 
 
-Creamos las funciones del titulo
+Creamos las funciones del titulo.
+
 ```{r}
 tag.map.title <- tags$style(HTML("
   .leaflet-control.map-title { 
@@ -842,7 +855,11 @@ title <- tags$div(
 
 ```
 
-Creamos el mapa añadiendo capas de marcadores con la latitud y longitud del dataframe y con los valores de los diferentes subconjuntos. Creamos capas para separar los datos de cada subconjunto y añadimos un titulo (usando las funciones del titulo definidas previamente)
+Creamos el mapa añadiendo capas de marcadores con la latitud y longitud del 
+dataframe y con los valores de los diferentes subconjuntos. Creamos capas para 
+separar los datos de cada subconjunto y añadimos un titulo (usando las funciones
+del titulo definidas previamente).
+
 ```{r}
 leaflet(data = mapa) %>% addTiles() %>%
   addAwesomeMarkers(~Longitud, ~Latitud, icon=iconsmedia, label=~as.character(mapa$media), group = "Media") %>% 
