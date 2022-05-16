@@ -368,6 +368,50 @@ df$Franja_horaria <- factor(df$Franja_horaria,
 
 ### Graficos
 
+#### Análisis univariante
+
+Hacemos un histograma que muestra la densidad de la variable Nivel_sonoro,
+dibujamos su curva de densidad y una línea roja que marca la media de la variable.
+
+```{r}
+ggplot(df, aes(x = Nivel_sonoro, na.rm = TRUE)) + geom_histogram(aes(y=stat(density)), binwidth = 5, col="blue", fill="red", alpha = .3) + geom_density() + geom_vline(xintercept = mean(df$Nivel_sonoro), linetype="dashed", color = "red")
+```
+Si utilizamos table sobre la variable Estacion, podemos ver que todas tienen
+un número de datos distinto, pero similar, excepto la 5, que tiene muchos menos.
+
+En cambio, si lo utilizamos sobre Franja_horaria, vemos que todas tienen el
+mismo número de datos.
+
+```{r}
+table(df$Estacion)
+
+table(df$Franja_horaria)
+```
+
+#### Análisis bivariante
+
+Utilizando ggcorr de la librería GGally, podemos ver que hay una alta correlación
+entre las distintas franjas horarias, con algunas acercándose al máximo de
+correlación.
+
+```{r}
+dfbiv <- df %>% spread(Franja_horaria, Nivel_sonoro)
+ggcorr(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"))
+```
+También podemos representar esto con ggpairs, que nos muestra el valor exacto
+de la correlación, además de gráficos para cada para los distintos valores.
+
+```{r}
+ggpairs(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), progress = FALSE)
+```
+Si calculamos la covarianza por Pearson y Spearman, podemos observar que esta
+es muy alta, lo que quiere decir que la relación entre las variables es elevada
+```{r}
+cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), method = "pearson")
+cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), method = "spearman")
+```
+
+
 #### Nivel sonoro por estación
 
 Seleccionamos la media del nivel sonoro por estación y la estación. Hacemos un 
@@ -454,7 +498,6 @@ df %>% group_by(Franja_horaria) %>%
   transition_states(Franja_horaria, wrap = FALSE) +
   shadow_mark()  +
   enter_fade()
-
 ```
 
 
@@ -844,5 +887,5 @@ los días de fin de semana, cuando la gente tiene más tiempo libre.
 
 Otra conclusión interesante que se puede extraer, es la contaminación acústica
 del barrio, puesto que prácticamente todos los días se supera el umbral de sonido
-a partir del cuál comienza la pérdida auditiva crónica, así como el de la pérdida
-de concentración y el de ruido en general, según la OMS.
+recomendado para una vida sana, así como el de la pérdida de concentración y el de
+ruido en general, según la OMS.
