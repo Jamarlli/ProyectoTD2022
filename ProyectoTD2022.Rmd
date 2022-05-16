@@ -165,7 +165,7 @@ summ <- df %>% select(recvTime,LAeq,LAeq_d,LAeq_den,LAeq_e,LAeq_n,dateObserved) 
 
 kable(summ) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 
-#g <- glimpse(df)
+#glim <- glimpse(df) # Lo comentamos porque no aporta nada al html
 
 kable(head(df)) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 ```
@@ -394,6 +394,7 @@ dibujamos su curva de densidad y una línea roja que marca la media de la variab
 ```{r}
 ggplot(df, aes(x = Nivel_sonoro, na.rm = TRUE)) + geom_histogram(aes(y=stat(density)), binwidth = 5, col="blue", fill="red", alpha = .3) + geom_density() + geom_vline(xintercept = mean(df$Nivel_sonoro), linetype="dashed", color = "red")
 ```
+
 Si utilizamos table sobre la variable Estacion, podemos ver que todas tienen
 un número de datos distinto, pero similar, excepto la 5, que tiene muchos menos.
 
@@ -401,9 +402,15 @@ En cambio, si lo utilizamos sobre Franja_horaria, vemos que todas tienen el
 mismo número de datos.
 
 ```{r}
-table(df$Estacion)
+kable(table(df$Estacion)) %>% 
+  kable_styling(bootstrap_options = c("striped","bordered","hover",
+                                      "condensed","responsive"),
+                full_width=F)
 
-table(df$Franja_horaria)
+kable(table(df$Franja_horaria)) %>% 
+  kable_styling(bootstrap_options = c("striped","bordered","hover",
+                                      "condensed","responsive"),
+                full_width=F)
 ```
 
 #### Análisis bivariante
@@ -416,17 +423,25 @@ correlación.
 dfbiv <- df %>% spread(Franja_horaria, Nivel_sonoro)
 ggcorr(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"))
 ```
+
 También podemos representar esto con ggpairs, que nos muestra el valor exacto
 de la correlación, además de gráficos para cada para los distintos valores.
 
 ```{r}
 ggpairs(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), progress = FALSE)
 ```
+
 Si calculamos la covarianza por Pearson y Spearman, podemos observar que esta
 es muy alta, lo que quiere decir que la relación entre las variables es elevada
+
 ```{r}
-cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), method = "pearson")
-cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), method = "spearman")
+pearson <- cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), 
+               method = "pearson")
+kable(pearson) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
+
+spearman <- cov(dfbiv %>% select("Dia 7-19h", "Tarde 19-23h", "Noche 23-7h", "Dia_tarde_noche", "1min"), 
+                method = "spearman")
+kable(spearman) %>% kable_styling(bootstrap_options = c("striped","bordered","hover","condensed","responsive"))
 ```
 
 
@@ -894,12 +909,12 @@ leaflet(data = mapa) %>% addTiles() %>%
 ```
 
 
-## Conclusiones Finales
+## Conclusiones Finales y Aportaciones adicionales
 
 Para finalizar el estudio mostraremos las conclusiones a las que hemos podido 
-llegar gracias al estudio de los datos recogidos por los sonómetros ubicados en 
+llegar gracias al analisis de los datos recogidos por los sonómetros ubicados en 
 Ruzafa. Llama la atención la cantidad de información y conclusiones que se
-pueden llegar a sacar dependiendo del enfoque que se le dé a estos datos.
+pueden llegar a extraer dependiendo de como enfoquemos los datos.
 
 Por ejemplo, desde el punto de vista de emprendimiento, se puede ver cuál es la 
 mejor ubicación para abrir un negocio, ya que podemos relacionar el nivel sonoro 
